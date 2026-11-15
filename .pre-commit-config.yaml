@@ -1,0 +1,23 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-imports
+        name: Ruff import sorting
+        entry: uv run --locked --extra dev --extra cpu ruff check --select I --fix
+        language: system
+        types_or: [python, pyi, jupyter]
+      - id: ruff-format
+        name: Ruff format
+        entry: uv run --locked --extra dev --extra cpu ruff format
+        language: system
+        types_or: [python, pyi, jupyter]
+      - id: logical-sections
+        name: Logical section spacing
+        entry: uv run --locked --extra dev --extra cpu python scripts/format_sections.py
+        language: system
+        types_or: [python, pyi]
+      - id: ruff-check
+        name: Ruff lint
+        entry: uv run --locked --extra dev --extra cpu ruff check
+        language: system
+        types_or: [python, pyi, jupyter]
