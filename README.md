@@ -31,8 +31,8 @@ The earlier **scratch-trained causal transformer** was **not** the pretrained Sy
 
 ```bash
 pip install -e '.[llm,dev]'
-python scripts/compare_pretrained.py --split test --count 100 --threads 2 --device cpu --out experiments/pretrained_test_100.json
-python scripts/plot_pretrained.py --input experiments/pretrained_test_100.json --out figures/pretrained_test_100
+python -m systemone_guard.benchmarking.pretrained --split test --count 100 --threads 2 --device cpu --out experiments/pretrained_test_100.json
+python scripts/plots.py pretrained --input experiments/pretrained_test_100.json --out figures/pretrained_test_100
 ```
 
 The script benchmarks **the same selected examples**, with strict typed output parsing, per-example predictions, accuracy/macro-F1, invalid output rate, **median and p95 per-request end-to-end CPU latency**, and actual plots. Both use two CPU threads, including input processing and output decoding; model downloads, initial loading and warmup are excluded. It also records SystemOne's typed decision probabilities. No pretrained-LLM scores are invented or copied from unrelated evaluations.
@@ -103,7 +103,7 @@ The architecture is an *original compact classifier*, not Jev's proprietary netw
 | SmolLM2-135M-Instruct | Existing Apache-2.0 pretrained instruction model | Request/context + typed state in prompt | Colab **benchmark script included; NOT executed** (network inaccessible here) |
 | SmolLM2-360M-Instruct | Existing Apache-2.0 pretrained instruction model | Request/context + typed state in prompt | Colab **benchmark script included; NOT executed** (network inaccessible here) |
 
-The causal decoder is still a narrowly trained small model, not a general language model; **do not claim superiority over modern pretrained LLMs based on its score**. The actual SmolLM2 comparator needs to run in your connected Colab environment. See `scripts/compare_hf_llm.py`.
+The causal decoder is still a narrowly trained small model, not a general language model; **do not claim superiority over modern pretrained LLMs based on its score**. The actual SmolLM2 comparator needs to run in your connected Colab environment. See `systemone_guard.benchmarking.pretrained`.
 
 ### Measured accuracy (synthetic data)
 
@@ -134,6 +134,22 @@ CPU, PyTorch, two threads, batch=128, 40 repeated forward passes after warmup (n
 
 These are *not* apples-to-apples pre-trained-LLM measurements and do not imply a 40–200x speedup over an LLM. End-to-end UI and CPU single-request latency will be different.
 
+## Development workflow
+
+The package uses a src layout, locked uv dependencies, Ruff formatting and linting,
+strict mypy, and self-contained CPU tests. From the repository root:
+
+```bash
+make setup
+make format
+make check
+make build
+make help
+```
+
+See [development conventions and all commands](docs/DEVELOPMENT.md) for dependency
+updates, optional extras, coverage, packaging, and research workflows.
+
 ## Quick start
 
 From the extracted project root:
@@ -148,11 +164,12 @@ python -m pytest -q
 Alternatively, with `uv`:
 
 ```bash
-uv sync --extra dev --extra demo
-uv run python -m pytest -q
+make setup
+make check
+make demo
 ```
 
-Pretrained model artifacts are bundled under `artifacts/guard_best/model.pt`, so the demo works without training.
+The original project bundle includes `artifacts/guard_best/model.pt`. These large artifacts are ignored by Git; a fresh checkout needs a supplied checkpoint or an explicit training run before launching the demo. Regular tests generate temporary fixtures. Use `make test-artifacts` to validate the original local assets.
 
 ## Exact reproducibility commands
 
@@ -184,33 +201,30 @@ python -m systemone_guard.evaluate --split val
 python -m systemone_guard.evaluate --split test
 python -m systemone_guard.evaluate --split challenge
 python scripts/evaluate_probes.py
-python scripts/plot_results.py
+python scripts/plots.py results
 python scripts/benchmark_latency.py
 ```
 
 The test dataset was inspected during this project development and the manual probes were examined *after* model selection; do not call them a blinded final test. For real use, build a fresh independently labeled benchmark **before** additional model tuning.
 
-### Compare with a real pretrained instruction LLM in Colab
+### Compare with pretrained instruction LLMs in Colab
 
-```bash
-pip install -e '.[llm]'
-python scripts/compare_hf_llm.py \
-  --model HuggingFaceTB/SmolLM2-135M-Instruct --split test --count 200
-```
-
-This script downloads an open-source model, prompts it with the **same** state and task policy, counts invalid outputs as incorrect, and saves both model predictions and end-to-end latency per example. It was **not run here**, because this runtime cannot access Hugging Face or download `transformers`. Hardware and inference method affect timing. The first 200 records are used as a fixed reproducible subset, and SystemOne is reevaluated on precisely those rows. Do not assert a win without running it.
+Use the [matched CPU benchmark](#compare-against-real-pretrained-instruction-llms)
+or the comparison notebook. The same seeded sample, strict output parser, and
+end-to-end timing boundary apply to both methods. Actual pretrained model results
+remain unreported until the comparison is run.
 
 ## Colab notebook
 
-Open `notebooks/Train_Evaluate_SystemOne_Guard.ipynb` in Google Colab, upload this whole ZIP in its setup cell, and run all. The notebook includes a retraining toggle and evaluates the packaged checkpoint by default. When running the pretrained LLM comparator, enable the optional GPU runtime to accelerate inference.
+Open `notebooks/Train_Evaluate_SystemOne_Guard.ipynb` in Google Colab, upload this whole ZIP in its setup cell, and run all. The notebook includes a retraining toggle and evaluates the packaged checkpoint by default. Run the matched pretrained comparison on CPU so both methods use the same device and timing boundary.
 
 ## File guide
 
-- `systemone_guard/`: model, tokenizer, synthetic generator, training, inference, metrics, baselines, causal comparator
+- `src/systemone_guard/`: model, tokenizer, synthetic generator, training, inference, metrics, baselines, causal comparator
 - `artifacts/`: real trained weights, experiment configs, histories, TF-IDF `.pkl` files (only load your trusted own files)
 - `experiments/`: raw per-example predictions, metrics, run logs, measured timing, manual probes
 - `figures/`: measured comparison, calibration, confusion, training loss, validation macro-F1
-- `scripts/compare_hf_llm.py`: optional actual pretrained System Two comparison
+- `systemone_guard.benchmarking.pretrained`: the matched pretrained System Two benchmark
 - `notebooks/`: Colab workflow
 - `spaces/`: Gradio app for HF Spaces
 - `hf_model/README.md`: HF model card
