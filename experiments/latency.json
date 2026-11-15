@@ -1,0 +1,20 @@
+{
+  "systemone_guard": {
+    "batch_size": 128,
+    "batch_p50_ms": 9.56970750007713,
+    "batch_p95_ms": 14.764503850005884,
+    "per_item_amortized_p50_ms": 0.07476333984435257,
+    "parameters": 21306,
+    "threads": 2,
+    "hardware": "CPU"
+  },
+  "causal_decoder_scratch": {
+    "batch_size": 128,
+    "batch_p50_ms": 14.14831099998537,
+    "batch_p95_ms": 20.123912750045747,
+    "per_item_amortized_p50_ms": 0.1105336796873857,
+    "parameters": 19011,
+    "threads": 2,
+    "hardware": "CPU"
+  }
+}
