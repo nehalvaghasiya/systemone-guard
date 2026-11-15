@@ -1,0 +1,32 @@
+{
+  "sample_size": 1500,
+  "method": "paired bootstrap resampling of test examples; 3000 replicates",
+  "comparisons": {
+    "guard_minus_word_tfidf": {
+      "difference_pp": 9.2,
+      "ci95_pp": [
+        7.8,
+        10.733333333333334
+      ]
+    },
+    "guard_minus_char_tfidf": {
+      "difference_pp": 18.46666666666667,
+      "ci95_pp": [
+        16.6,
+        20.466666666666665
+      ]
+    },
+    "guard_minus_causal_decoder_scratch": {
+      "difference_pp": 11.733333333333333,
+      "ci95_pp": [
+        10.133333333333333,
+        13.4
+      ]
+    }
+  },
+  "test_class_balance": {
+    "allow": 104,
+    "review": 312,
+    "block": 1084
+  }
+}
