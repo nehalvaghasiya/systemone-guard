@@ -6,6 +6,8 @@ import shutil
 import sys
 from pathlib import Path
 
+from systemone_guard.checkpoints import DEFAULT_CHECKPOINT
+
 if sys.version_info >= (3, 11):
     import tomllib as toml
 else:
@@ -13,7 +15,7 @@ else:
 
 
 def prepare(root: Path, output: Path, checkpoint: Path | None = None) -> Path:
-    checkpoint = checkpoint or root / "artifacts/guard_best/model.pt"
+    checkpoint = checkpoint or root / DEFAULT_CHECKPOINT
 
     if not checkpoint.is_file():
         raise FileNotFoundError(f"Checkpoint required for Space export: {checkpoint}")
@@ -26,7 +28,7 @@ def prepare(root: Path, output: Path, checkpoint: Path | None = None) -> Path:
         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
     )
     shutil.copy2(root / "spaces/app.py", output / "app.py")
-    weights = output / "artifacts/guard_best/model.pt"
+    weights = output / DEFAULT_CHECKPOINT
     weights.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(checkpoint, weights)
     project = toml.loads((root / "pyproject.toml").read_text())["project"]
@@ -37,7 +39,7 @@ def prepare(root: Path, output: Path, checkpoint: Path | None = None) -> Path:
     return output
 
 
-SPACE_README = "---\ntitle: SystemOne Guard\nemoji: 🛡️\ncolorFrom: blue\ncolorTo: gray\nsdk: gradio\napp_file: app.py\npinned: false\n---\n\n# SystemOne Guard\n\nSingle-pass typed probabilistic decision network trained from scratch on synthetic examples. Research only, **not a reliable security detector**. Novel manually written adversarial cases were almost all missed. See the main repository documentation for experiment provenance, tests, limitations, and benchmarks.\n"
+SPACE_README = "---\ntitle: SystemOne Guard\nemoji: 🛡️\ncolorFrom: blue\ncolorTo: gray\nsdk: gradio\napp_file: app.py\npinned: false\n---\n\n# SystemOne Guard\n\nSingle-pass typed probabilistic decision network trained from scratch on synthetic examples. Research only, **not a reliable security detector**. The original 21K checkpoint missed unfamiliar attack wording; the updated subword/attention model is evaluated against fine-tuned SmolLM2 on the original probes and a separate wording set. See the main repository documentation for experiment provenance, tests, limitations, and benchmarks.\n"
 
 
 def publish(root: Path, repo: str, checkpoint: Path, public: bool = False) -> None:
@@ -85,9 +87,7 @@ def main() -> None:
     )
     upload.add_argument("--repo", required=True)
     upload.add_argument("--public", action="store_true")
-    upload.add_argument(
-        "--checkpoint", type=Path, default=root / "artifacts/guard_best/model.pt"
-    )
+    upload.add_argument("--checkpoint", type=Path, default=root / DEFAULT_CHECKPOINT)
     args = parser.parse_args()
 
     if args.command == "prepare":

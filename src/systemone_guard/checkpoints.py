@@ -7,6 +7,8 @@ import torch
 from .model import GuardNet, Tokenizer
 from .types import GuardCheckpoint, Pathish
 
+DEFAULT_CHECKPOINT = "artifacts/guard_scaled/model.pt"
+
 
 def read_checkpoint(path: Pathish) -> GuardCheckpoint:
     return cast(

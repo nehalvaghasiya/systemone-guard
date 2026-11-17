@@ -6,14 +6,29 @@ EXTRAS ?= --extra dev --extra cpu
 ARGS ?=
 RUN = $(UV) run --locked --python $(PYTHON) $(EXTRAS)
 CODE = src scripts spaces tests notebooks
+GPU_ENV ?= .venv-gpu
+GUARD_CHECKPOINT ?= artifacts/guard_scaled/model.pt
+ADAPTER ?= artifacts/smollm2_lora/best
+BENCH_SCOPE ?= systemd-run --user --scope --unit=systemone-guard-benchmark -p MemoryMax=1536M -p MemoryHigh=1536M -p MemorySwapMax=0 -p CPUQuota=150% nice -n 10
+TRAIN_SCOPE ?= systemd-run --user --scope --unit=systemone-guard-training -p MemoryMax=2G -p MemoryHigh=1920M -p MemorySwapMax=0 -p CPUQuota=150% nice -n 10
+GPU_RUN = UV_PROJECT_ENVIRONMENT="$(GPU_ENV)" $(UV) run --locked --python $(PYTHON) --extra dev --extra gpu --extra finetune
 
-.PHONY: help setup lock format format-check lint typecheck test test-artifacts coverage build verify-package audit check clean hooks data train evaluate benchmark demo prepare-space plots probes statistics smoke-extras
+.PHONY: help setup setup-gpu finetune improve-guard lock format format-check lint typecheck test test-artifacts coverage build verify-package audit check clean hooks data train evaluate benchmark demo prepare-space plots report smoke-extras
 
 help: ## Show available development and research commands
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z_-]+:.*## / {printf "  %-18s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 setup: ## Install the locked CPU development environment
 	$(UV) sync --locked --python $(PYTHON) $(EXTRAS)
+
+setup-gpu: ## Install a separate CUDA 12.6 training environment
+	UV_PROJECT_ENVIRONMENT="$(GPU_ENV)" $(UV) sync --locked --python $(PYTHON) --extra dev --extra gpu --extra finetune
+
+improve-guard: ## Train the subword guard on broader data; select with validation only
+	$(TRAIN_SCOPE) env UV_PROJECT_ENVIRONMENT="$(GPU_ENV)" $(UV) run --locked --python $(PYTHON) --extra dev --extra gpu --extra finetune python -m systemone_guard.robust_train $(ARGS)
+
+finetune: ## Train SmolLM2 LoRA on train; select and calibrate on validation
+	$(GPU_RUN) python -m systemone_guard.benchmarking.finetune $(ARGS)
 
 lock: ## Refresh the lockfile after changing dependencies (ARGS=--upgrade to upgrade)
 	$(UV) lock $(ARGS)
@@ -49,7 +64,7 @@ build: ## Build and validate wheel and source distribution
 	$(RUN) twine check dist/systemone_guard-*.whl dist/systemone_guard-*.tar.gz
 
 verify-package: build ## Install the wheel in an isolated environment and check inference
-	JEV_UV="$(UV)" $(RUN) python -m pytest -q -m packaging $(ARGS)
+	SYSTEMONE_GUARD_UV="$(UV)" $(RUN) python -m pytest -q -m packaging $(ARGS)
 
 audit: ## Audit the locked installed dependencies against vulnerability advisories
 	$(RUN) python scripts/audit_dependencies.py $(ARGS)
@@ -70,11 +85,11 @@ data: ## Generate deterministic synthetic data (ARGS='--out ... --seed ...')
 train: ## Train the guard (ARGS='--data ... --out ...')
 	$(RUN) python -m systemone_guard.train $(ARGS)
 
-evaluate: ## Evaluate saved models (ARGS='--split test --out ...')
+evaluate: ## Evaluate guard-only diagnostics (ARGS='--split test --out ...')
 	$(RUN) python -m systemone_guard.evaluate $(ARGS)
 
-benchmark: ## Run the opt-in pretrained benchmark; may download model weights
-	$(RUN) --extra llm python -m systemone_guard.benchmarking.pretrained $(ARGS)
+benchmark: ## Compare guard and fine-tuned SmolLM2 on matched GPU requests
+	$(BENCH_SCOPE) env UV_PROJECT_ENVIRONMENT="$(GPU_ENV)" $(UV) run --locked --python $(PYTHON) --extra dev --extra gpu --extra finetune python -m systemone_guard.benchmarking.comparison --adapter "$(ADAPTER)" --guard-checkpoint "$(GUARD_CHECKPOINT)" $(ARGS)
 
 demo: ## Launch the Gradio demo using an existing checkpoint
 	$(RUN) --extra demo python spaces/app.py $(ARGS)
@@ -82,14 +97,11 @@ demo: ## Launch the Gradio demo using an existing checkpoint
 prepare-space: ## Prepare a standalone local HF Space export
 	$(RUN) python scripts/huggingface.py prepare $(ARGS)
 
-plots: ## Plot existing evaluation reports
-	$(RUN) python scripts/plots.py results $(ARGS)
+plots: ## Regenerate all six figures from matched fine-tuned comparison reports
+	$(RUN) python scripts/plots.py $(ARGS)
 
-probes: ## Evaluate the manually authored diagnostic probes
-	$(RUN) python scripts/evaluate_probes.py $(ARGS)
-
-statistics: ## Bootstrap existing evaluation predictions
-	$(RUN) python scripts/bootstrap_summary.py $(ARGS)
+report: ## Regenerate comparison documentation and result tables from raw records
+	$(RUN) python -m systemone_guard.benchmarking.reporting $(ARGS)
 
 smoke-extras: ## Validate optional adapters without model downloads or publication
 	$(RUN) --extra demo --extra llm --extra publish python -m pytest -q -m optional $(ARGS)

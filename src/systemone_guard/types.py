@@ -76,17 +76,31 @@ class DecisionResult(TypedDict):
     temperature: float
 
 
-class TokenizerConfig(TypedDict):
+class TokenizerConfigRequired(TypedDict):
     max_words: int
     max_len: int
     stoi: dict[str, int]
 
 
-class GuardConfig(TypedDict):
+class TokenizerConfig(TokenizerConfigRequired, total=False):
+    subword_buckets: int
+    subword_slots: int
+    context_only: bool
+
+
+class GuardConfigRequired(TypedDict):
     vocab: int
     dim: int
     hidden: int
     dropout: float
+
+
+class GuardConfig(GuardConfigRequired, total=False):
+    subword_buckets: int
+    mean_pool: bool
+    attention_layers: int
+    max_positions: int
+    factorized_policy: bool
 
 
 class GuardCheckpointRequired(TypedDict):
@@ -98,20 +112,6 @@ class GuardCheckpointRequired(TypedDict):
 class GuardCheckpoint(GuardCheckpointRequired, total=False):
     seed: int
     temperature: float
-
-
-class CausalConfig(TypedDict):
-    vocab: int
-    dim: int
-    layers: int
-    heads: int
-    max_len: int
-
-
-class CausalCheckpoint(TypedDict):
-    state_dict: dict[str, Tensor]
-    config: CausalConfig
-    tokenizer: TokenizerConfig
 
 
 class MetricValues(TypedDict):

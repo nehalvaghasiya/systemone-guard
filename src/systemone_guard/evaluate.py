@@ -1,15 +1,12 @@
-"""Frozen checkpoints only, test once after validation selection."""
+"""Guard-only diagnostics; published model comparisons use benchmarking.comparison."""
 
 import argparse
 import json
-import pickle
 from pathlib import Path
 
 import numpy as np
 
-from .baselines import probs as baseline_probs
-from .causal import load_causal
-from .causal import predict as causal_probs
+from .checkpoints import DEFAULT_CHECKPOINT
 from .data import CLASSES, load
 from .metrics import score
 from .train import load_checkpoint, predict_probs
@@ -19,29 +16,14 @@ from .types import Head, Pathish, Scores
 def eval_split(
     split: str = "test",
     data: Pathish = "data",
-    artifact: Pathish = "artifacts/guard_best/model.pt",
-    out: Pathish = "experiments",
-    include_causal: bool = True,
-    artifacts: Pathish = "artifacts",
+    artifact: Pathish = DEFAULT_CHECKPOINT,
+    out: Pathish = "artifacts/guard_evaluation",
 ) -> dict[str, Scores]:
     rows = load(split, data)
     y = np.array([CLASSES.index(r["decision"]) for r in rows])
     m, t, temp = load_checkpoint(artifact)
     pred = predict_probs(m, rows, t, temperature=temp)
     names = {"systemone_guard": pred["decision"]}
-
-    for name in ("word_tfidf", "char_tfidf"):
-        file = Path(artifacts) / (name + ".pkl")
-
-        if file.exists():
-            with file.open("rb") as f:
-                model = pickle.load(f)
-
-            names[name] = baseline_probs(model, rows)
-
-    if include_causal and (Path(artifacts) / "causal/model.pt").exists():
-        c, ct = load_causal(Path(artifacts) / "causal/model.pt")
-        names["causal_decoder_scratch"] = causal_probs(c, ct, rows)
 
     results = {name: score(p, y) for name, p in names.items()}
 
@@ -98,9 +80,8 @@ def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--split", choices=["val", "test", "challenge"], default="test")
     p.add_argument("--data", default="data")
-    p.add_argument("--artifact", default="artifacts/guard_best/model.pt")
-    p.add_argument("--out", default="experiments")
-    p.add_argument("--artifacts", default="artifacts")
+    p.add_argument("--artifact", default=DEFAULT_CHECKPOINT)
+    p.add_argument("--out", default="artifacts/guard_evaluation")
     a = p.parse_args()
     eval_split(**vars(a))
 
