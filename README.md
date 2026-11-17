@@ -1,12 +1,12 @@
 # systemone-guard
 
-A small System One classifier for agent tool-call risk assessment. **756,248 parameters**, trained from scratch, with a task-fine-tuned **SmolLM2-135M-Instruct** comparison.
+SystemOne Guard is a **756K-parameter model trained from scratch** to assess risk in AI agent tool calls.
 
-SystemOne Guard takes a request, untrusted context, and five typed state fields. One forward pass produces `allow`, `review`, and `block` probabilities plus `sensitive`, `approval_needed`, and `attack` probabilities. The context encoder uses word and character-subword embeddings, parallel convolutions, three attention layers, attention/mean pooling, and a source-independent context-intent head. Learned policy heads combine intent and typed state. Typed state is authoritative, so the updated context classifier does not use request wording.
+- **Input:** untrusted context and structured state, such as action, sensitivity, and authorization.
+- **Output:** `allow`, `review`, and `block` probabilities, plus sensitivity, approval, and attack scores.
+- **Comparison:** benchmarked against fine-tuned SmolLM2-135M using matched inputs and the same GPU.
 
-This is an original Jev-inspired research prototype with a synthetic policy task. The original 21K guard missed all ten unfamiliar attack phrasings. The refactored model and its separate wording evaluation are documented below. It is unsuitable as a production permissions or security boundary.
-
-The refactored guard reaches 24/24 on the existing manual probes, versus 23/24 for frozen SmolLM2 LoRA and 13/24 for the original guard. It remains a research model: the separate wording set exposes missed attacks. The [experiment record](docs/GUARD_IMPROVEMENT.md) retains all target results, including failures.
+**Research only:** trained on synthetic data and still misses unfamiliar attacks. Keep authorization and approval checks independent. See [results and limitations](docs/GUARD_IMPROVEMENT.md).
 
 ## Measured comparison
 
