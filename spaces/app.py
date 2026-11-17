@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from typing import TYPE_CHECKING
 
+from systemone_guard.checkpoints import DEFAULT_CHECKPOINT
 from systemone_guard.data import ACTIONS, AUTH, DESTINATIONS, SENSITIVITY, TRUST
 from systemone_guard.inference import DecisionEngine
 from systemone_guard.types import DecisionResult, Pathish
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
     import gradio as gr
 
 
-def create_demo(checkpoint: Pathish = "artifacts/guard_best/model.pt") -> gr.Blocks:
+def create_demo(checkpoint: Pathish = DEFAULT_CHECKPOINT) -> gr.Blocks:
     import gradio as gr
 
     engine = DecisionEngine(checkpoint)
@@ -104,7 +105,7 @@ def create_demo(checkpoint: Pathish = "artifacts/guard_best/model.pt") -> gr.Blo
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--checkpoint", default="artifacts/guard_best/model.pt")
+    parser.add_argument("--checkpoint", default=DEFAULT_CHECKPOINT)
     args = parser.parse_args()
     create_demo(args.checkpoint).launch()
 

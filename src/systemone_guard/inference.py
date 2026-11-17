@@ -5,15 +5,17 @@ import json
 
 import torch
 
-from .checkpoints import load_checkpoint
+from .checkpoints import DEFAULT_CHECKPOINT, load_checkpoint
 from .data import CLASSES
 from .model import FIELD_TYPES, encode_single
 from .types import DecisionInput, DecisionResult, Pathish
 
 
 class DecisionEngine:
-    def __init__(self, path: Pathish = "artifacts/guard_best/model.pt") -> None:
+    def __init__(self, path: Pathish = DEFAULT_CHECKPOINT, device: str = "cpu") -> None:
         self.model, self.tok, self.temperature = load_checkpoint(path)
+        self.device = torch.device(device)
+        self.model.to(self.device)
 
     def decide(
         self,
@@ -44,9 +46,9 @@ class DecisionEngine:
         a, b = encode_single(r, self.tok)
 
         with torch.inference_mode():
-            raw = self.model(a, b)
+            raw = self.model(a.to(self.device), b.to(self.device))
 
-        p = torch.softmax(raw["decision"] / self.temperature, dim=-1)[0].numpy()
+        p = torch.softmax(raw["decision"] / self.temperature, dim=-1)[0].cpu().numpy()
         ix = int(p.argmax())
         decision = CLASSES[ix]
 
@@ -80,7 +82,7 @@ def main() -> None:
     p.add_argument("--destination", default="internal")
     p.add_argument("--authorization", default="approved")
     p.add_argument("--source", default="user")
-    p.add_argument("--checkpoint", default="artifacts/guard_best/model.pt")
+    p.add_argument("--checkpoint", default=DEFAULT_CHECKPOINT)
     args = p.parse_args()
     checkpoint = args.checkpoint
     del args.checkpoint

@@ -27,7 +27,7 @@ def test_isolated_wheel(
     environment = tmp_path / "venv"
     env = {**os.environ, "UV_PROJECT_ENVIRONMENT": str(environment)}
     env.pop("VIRTUAL_ENV", None)
-    uv = os.environ.get("JEV_UV", "uv")
+    uv = os.environ.get("SYSTEMONE_GUARD_UV", "uv")
     subprocess.run(
         [
             uv,
@@ -54,11 +54,11 @@ def test_isolated_wheel(
 from pathlib import Path
 import sys
 import systemone_guard
-from systemone_guard.benchmarking.pretrained import parse_label
+from systemone_guard.benchmarking.comparison import parse_typed_label
 package = Path(systemone_guard.__file__).resolve()
 assert Path(sys.prefix) in package.parents, package
 assert (package.parent / 'py.typed').is_file()
-assert parse_label('ALLOW') == 'allow'
+assert parse_typed_label('allow no no no') == 'allow'
 """
     subprocess.run([str(python), "-c", code], cwd=tmp_path, env=env, check=True)
     inputs = decision_input(sample)

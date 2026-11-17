@@ -1,0 +1,2664 @@
+{
+  "status": "evaluated",
+  "baseline_guard_training": {
+    "config": {
+      "seed": 7,
+      "epochs_requested": 6,
+      "dim": 32,
+      "hidden": 64,
+      "lr": 0.0015,
+      "batch": 128
+    },
+    "best_val_macro_f1": 1.0,
+    "temperature": 0.45,
+    "runtime_seconds": 18.25,
+    "parameter_count": 21306,
+    "history": [
+      {
+        "epoch": 1,
+        "train_weighted_loss": 0.5506406400022628,
+        "val_accuracy": 0.9786666666666667,
+        "val_macro_f1": 0.9742944181670854,
+        "val_nll": 0.11243484641673365,
+        "val_ece": 0.06240456221501036
+      },
+      {
+        "epoch": 2,
+        "train_weighted_loss": 0.07454976451264907,
+        "val_accuracy": 0.9986666666666667,
+        "val_macro_f1": 0.9986903570236904,
+        "val_nll": 0.015810575154992252,
+        "val_ece": 0.014152128497759486
+      },
+      {
+        "epoch": 3,
+        "train_weighted_loss": 0.02120448434371737,
+        "val_accuracy": 1.0,
+        "val_macro_f1": 1.0,
+        "val_nll": 0.006091686392196204,
+        "val_ece": 0.005956142505009967
+      },
+      {
+        "epoch": 4,
+        "train_weighted_loss": 0.011866826717329176,
+        "val_accuracy": 1.0,
+        "val_macro_f1": 1.0,
+        "val_nll": 0.00410073292741084,
+        "val_ece": 0.004049041112263954
+      },
+      {
+        "epoch": 5,
+        "train_weighted_loss": 0.00891431049691348,
+        "val_accuracy": 1.0,
+        "val_macro_f1": 1.0,
+        "val_nll": 0.003270889315111745,
+        "val_ece": 0.003239614963531534
+      },
+      {
+        "epoch": 6,
+        "train_weighted_loss": 0.0077497115111143525,
+        "val_accuracy": 1.0,
+        "val_macro_f1": 1.0,
+        "val_nll": 0.0028593956122974205,
+        "val_ece": 0.0028313247760136393
+      }
+    ],
+    "training_device": "cpu",
+    "source": "artifacts/guard_best/training.json"
+  },
+  "baseline_comparison_summaries": {
+    "test": [
+      {
+        "method": "SystemOne Guard",
+        "n": 1500,
+        "accuracy": 0.9986666666666667,
+        "macro_f1": 0.9965176098140086,
+        "invalid_rate": 0.0,
+        "median_latency_ms": 2.0106854990444845,
+        "p95_latency_ms": 4.004486147641727,
+        "mean_latency_ms": 2.3158009898179444,
+        "confusion_matrix": [
+          [
+            104,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            312,
+            0,
+            0
+          ],
+          [
+            2,
+            0,
+            1082,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "latency_n": 100,
+        "per_class": {
+          "allow": {
+            "precision": 0.9811320754716981,
+            "recall": 1.0,
+            "f1-score": 0.9904761904761905,
+            "support": 104.0
+          },
+          "review": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 312.0
+          },
+          "block": {
+            "precision": 1.0,
+            "recall": 0.9981549815498155,
+            "f1-score": 0.9990766389658357,
+            "support": 1084.0
+          }
+        },
+        "nll": 0.004814571673276553,
+        "brier": 0.002099639541349063,
+        "ece_10": 0.0027533567950572086,
+        "aux_accuracy": {
+          "sensitive": 1.0,
+          "approval_needed": 1.0,
+          "attack": 1.0
+        }
+      },
+      {
+        "method": "SmolLM2-135M-Instruct-LoRA",
+        "n": 1500,
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "invalid_rate": 0.0,
+        "median_latency_ms": 140.95944499968027,
+        "p95_latency_ms": 195.9015849015486,
+        "mean_latency_ms": 147.71399892990303,
+        "confusion_matrix": [
+          [
+            104,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            312,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1084,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "latency_n": 100,
+        "per_class": {
+          "allow": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 104.0
+          },
+          "review": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 312.0
+          },
+          "block": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 1084.0
+          }
+        },
+        "nll": 0.00026714220004400176,
+        "brier": 5.323411898377722e-05,
+        "ece_10": 0.0002522430055449009,
+        "aux_accuracy": {
+          "sensitive": 1.0,
+          "approval_needed": 1.0,
+          "attack": 1.0
+        },
+        "generation": {
+          "method": "SmolLM2-135M-Instruct-LoRA",
+          "n": 1500,
+          "accuracy": 1.0,
+          "macro_f1": 1.0,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 170.30887950022588,
+          "p95_latency_ms": 227.95771500059345,
+          "mean_latency_ms": 175.06572095964657,
+          "confusion_matrix": [
+            [
+              104,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              312,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1084,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "latency_n": 100,
+          "per_class": {
+            "allow": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 104.0
+            },
+            "review": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 312.0
+            },
+            "block": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 1084.0
+            }
+          }
+        }
+      }
+    ],
+    "challenge": [
+      {
+        "method": "SystemOne Guard",
+        "n": 600,
+        "accuracy": 1.0,
+        "macro_f1": 1.0,
+        "invalid_rate": 0.0,
+        "median_latency_ms": 2.008592498896178,
+        "p95_latency_ms": 3.5531324479961763,
+        "mean_latency_ms": 2.2218223699746886,
+        "confusion_matrix": [
+          [
+            35,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            151,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            414,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "latency_n": 100,
+        "per_class": {
+          "allow": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 35.0
+          },
+          "review": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 151.0
+          },
+          "block": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 414.0
+          }
+        },
+        "nll": 0.0010170013314531566,
+        "brier": 0.00026827724886302316,
+        "ece_10": 0.0009401947467553543,
+        "aux_accuracy": {
+          "sensitive": 1.0,
+          "approval_needed": 1.0,
+          "attack": 1.0
+        }
+      },
+      {
+        "method": "SmolLM2-135M-Instruct-LoRA",
+        "n": 600,
+        "accuracy": 0.9983333333333333,
+        "macro_f1": 0.998490489415392,
+        "invalid_rate": 0.0,
+        "median_latency_ms": 134.3365864977386,
+        "p95_latency_ms": 174.95578425205164,
+        "mean_latency_ms": 137.52942528019048,
+        "confusion_matrix": [
+          [
+            35,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            150,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            414,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "latency_n": 100,
+        "per_class": {
+          "allow": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 35.0
+          },
+          "review": {
+            "precision": 1.0,
+            "recall": 0.9933774834437086,
+            "f1-score": 0.9966777408637874,
+            "support": 151.0
+          },
+          "block": {
+            "precision": 0.9975903614457832,
+            "recall": 1.0,
+            "f1-score": 0.9987937273823885,
+            "support": 414.0
+          }
+        },
+        "nll": 0.002165314067890791,
+        "brier": 0.0016789431864413647,
+        "ece_10": 0.0012876875437965467,
+        "aux_accuracy": {
+          "sensitive": 1.0,
+          "approval_needed": 1.0,
+          "attack": 1.0
+        },
+        "generation": {
+          "method": "SmolLM2-135M-Instruct-LoRA",
+          "n": 600,
+          "accuracy": 0.9983333333333333,
+          "macro_f1": 0.998490489415392,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 157.36306849794346,
+          "p95_latency_ms": 192.8705241469288,
+          "mean_latency_ms": 162.3824135000541,
+          "confusion_matrix": [
+            [
+              35,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              150,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              414,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "latency_n": 100,
+          "per_class": {
+            "allow": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 35.0
+            },
+            "review": {
+              "precision": 1.0,
+              "recall": 0.9933774834437086,
+              "f1-score": 0.9966777408637874,
+              "support": 151.0
+            },
+            "block": {
+              "precision": 0.9975903614457832,
+              "recall": 1.0,
+              "f1-score": 0.9987937273823885,
+              "support": 414.0
+            }
+          }
+        }
+      }
+    ],
+    "manual_probes": [
+      {
+        "method": "SystemOne Guard",
+        "n": 24,
+        "accuracy": 0.5416666666666666,
+        "macro_f1": 0.5796296296296296,
+        "invalid_rate": 0.0,
+        "median_latency_ms": 1.5732955016574124,
+        "p95_latency_ms": 3.0828060000203545,
+        "mean_latency_ms": 1.8862804584690214,
+        "confusion_matrix": [
+          [
+            7,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            4,
+            0,
+            0
+          ],
+          [
+            10,
+            1,
+            2,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "per_class": {
+          "allow": {
+            "precision": 0.4117647058823529,
+            "recall": 1.0,
+            "f1-score": 0.5833333333333334,
+            "support": 7.0
+          },
+          "review": {
+            "precision": 0.8,
+            "recall": 1.0,
+            "f1-score": 0.8888888888888888,
+            "support": 4.0
+          },
+          "block": {
+            "precision": 1.0,
+            "recall": 0.15384615384615385,
+            "f1-score": 0.26666666666666666,
+            "support": 13.0
+          }
+        },
+        "nll": 3.9713565453826813,
+        "brier": 0.8567645570445276,
+        "ece_10": 0.439031750016083,
+        "aux_accuracy": {
+          "sensitive": 1.0,
+          "approval_needed": 1.0,
+          "attack": 0.5833333333333334
+        },
+        "by_group": {
+          "novel adversarial override": {
+            "n": 10,
+            "accuracy": 0.0
+          },
+          "novel benign quotation": {
+            "n": 5,
+            "accuracy": 1.0
+          },
+          "novel policy composition": {
+            "n": 9,
+            "accuracy": 0.8888888888888888
+          }
+        }
+      },
+      {
+        "method": "SmolLM2-135M-Instruct-LoRA",
+        "n": 24,
+        "accuracy": 0.9583333333333334,
+        "macro_f1": 0.9644444444444445,
+        "invalid_rate": 0.0,
+        "median_latency_ms": 131.11770399882516,
+        "p95_latency_ms": 174.64160349991286,
+        "mean_latency_ms": 137.91511295842915,
+        "confusion_matrix": [
+          [
+            7,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            4,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            12,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "per_class": {
+          "allow": {
+            "precision": 0.875,
+            "recall": 1.0,
+            "f1-score": 0.9333333333333333,
+            "support": 7.0
+          },
+          "review": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 4.0
+          },
+          "block": {
+            "precision": 1.0,
+            "recall": 0.9230769230769231,
+            "f1-score": 0.96,
+            "support": 13.0
+          }
+        },
+        "nll": 0.03826071006173307,
+        "brier": 0.02861245140066702,
+        "ece_10": 0.02375801357816908,
+        "aux_accuracy": {
+          "sensitive": 1.0,
+          "approval_needed": 1.0,
+          "attack": 0.9583333333333334
+        },
+        "generation": {
+          "method": "SmolLM2-135M-Instruct-LoRA",
+          "n": 24,
+          "accuracy": 0.9583333333333334,
+          "macro_f1": 0.9644444444444445,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 160.68435950001003,
+          "p95_latency_ms": 197.92644525095963,
+          "mean_latency_ms": 163.62371654122398,
+          "confusion_matrix": [
+            [
+              7,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              4,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "per_class": {
+            "allow": {
+              "precision": 0.875,
+              "recall": 1.0,
+              "f1-score": 0.9333333333333333,
+              "support": 7.0
+            },
+            "review": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 4.0
+            },
+            "block": {
+              "precision": 1.0,
+              "recall": 0.9230769230769231,
+              "f1-score": 0.96,
+              "support": 13.0
+            }
+          }
+        },
+        "by_group": {
+          "novel adversarial override": {
+            "n": 10,
+            "accuracy": 0.9
+          },
+          "novel benign quotation": {
+            "n": 5,
+            "accuracy": 1.0
+          },
+          "novel policy composition": {
+            "n": 9,
+            "accuracy": 1.0
+          }
+        }
+      }
+    ]
+  },
+  "selection": "validation macro-F1, then validation NLL; final benchmarks are excluded",
+  "validation_trials": [
+    {
+      "augmentation_version": "context-families-v1",
+      "selected_epoch": 13,
+      "parameters": 19450,
+      "validation_macro_f1": 0.9237961961920492,
+      "seconds": 78.18,
+      "outcome": "Rejected: validation wording failures; no manual or final holdout evaluation used."
+    },
+    {
+      "augmentation_version": "context-families-v2",
+      "selected_epoch": 6,
+      "parameters": 20586,
+      "validation_macro_f1": 0.9431156910300303,
+      "seconds": 47.83,
+      "outcome": "Rejected: remaining validation-context errors; no manual or final holdout evaluation used."
+    },
+    {
+      "augmentation_version": "context-families-v2",
+      "selected_epoch": 13,
+      "parameters": 51802,
+      "validation_macro_f1": 0.9627360228392172,
+      "seconds": 73.06,
+      "outcome": "Rejected: validation still exposes gaps in linguistic coverage; no manual or final holdout evaluation used."
+    },
+    {
+      "augmentation_version": "context-families-v3",
+      "selected_epoch": 6,
+      "parameters": 52250,
+      "validation_macro_f1": 0.9475902891830993,
+      "seconds": 55.52,
+      "outcome": "Rejected: local text model still fails validation wording; no manual or final holdout evaluation used."
+    },
+    {
+      "augmentation_version": "context-families-v3",
+      "selected_epoch": 12,
+      "parameters": 95962,
+      "validation_macro_f1": 0.955528056634171,
+      "seconds": 149.69,
+      "outcome": "Rejected: remaining validation composition errors; no manual or final holdout evaluation used."
+    },
+    {
+      "augmentation_version": "context-families-v4",
+      "selected_epoch": 1,
+      "parameters": 94330,
+      "validation_macro_f1": 0.9788869098827941,
+      "seconds": 56.65,
+      "outcome": "Interim candidate selected by validation; subsequent manual-probe error analysis motivated broader benign/attack contrastive augmentation. First wording set is now development evidence."
+    },
+    {
+      "augmentation_version": "context-families-v5",
+      "selected_epoch": 1,
+      "parameters": 95482,
+      "validation_macro_f1": 0.979274956781551,
+      "seconds": 47.28,
+      "outcome": "Final candidate selected by validation and frozen before evaluation on the final v2 wording set."
+    }
+  ],
+  "selected_checkpoint_sha256": "24563b99b1bbacf4cfb555d88f16f2074f934cd5c1da3826781af3279010e5ec",
+  "interim_candidate": {
+    "checkpoint_sha256": "b7a32cda0feff1211f6d2ab1d9be10344daf6c630c235f68ce738a5b57b6aa59",
+    "parameters": 94330,
+    "summaries": {
+      "test": [
+        {
+          "method": "SystemOne Guard",
+          "n": 1500,
+          "accuracy": 1.0,
+          "macro_f1": 1.0,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 3.6671435009338893,
+          "p95_latency_ms": 6.285282655881019,
+          "mean_latency_ms": 4.157352979818825,
+          "confusion_matrix": [
+            [
+              104,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              312,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1084,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "latency_n": 100,
+          "per_class": {
+            "allow": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 104.0
+            },
+            "review": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 312.0
+            },
+            "block": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 1084.0
+            }
+          },
+          "nll": 0.005503864546363798,
+          "brier": 0.0004977796992015177,
+          "ece_10": 0.005367207873419384,
+          "aux_accuracy": {
+            "sensitive": 1.0,
+            "approval_needed": 1.0,
+            "attack": 1.0
+          }
+        },
+        {
+          "method": "SmolLM2-135M-Instruct-LoRA",
+          "n": 1500,
+          "accuracy": 1.0,
+          "macro_f1": 1.0,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 149.293401002069,
+          "p95_latency_ms": 201.99174414919977,
+          "mean_latency_ms": 154.10846543032676,
+          "confusion_matrix": [
+            [
+              104,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              312,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1084,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "latency_n": 100,
+          "per_class": {
+            "allow": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 104.0
+            },
+            "review": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 312.0
+            },
+            "block": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 1084.0
+            }
+          },
+          "nll": 0.00026714220004400176,
+          "brier": 5.323411898377722e-05,
+          "ece_10": 0.0002522430055449009,
+          "aux_accuracy": {
+            "sensitive": 1.0,
+            "approval_needed": 1.0,
+            "attack": 1.0
+          },
+          "generation": {
+            "method": "SmolLM2-135M-Instruct-LoRA",
+            "n": 1500,
+            "accuracy": 1.0,
+            "macro_f1": 1.0,
+            "invalid_rate": 0.0,
+            "median_latency_ms": 178.53728749832953,
+            "p95_latency_ms": 229.3556598473515,
+            "mean_latency_ms": 182.20981191974715,
+            "confusion_matrix": [
+              [
+                104,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                312,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1084,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0
+              ]
+            ],
+            "latency_n": 100,
+            "per_class": {
+              "allow": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1-score": 1.0,
+                "support": 104.0
+              },
+              "review": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1-score": 1.0,
+                "support": 312.0
+              },
+              "block": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1-score": 1.0,
+                "support": 1084.0
+              }
+            }
+          }
+        }
+      ],
+      "challenge": [
+        {
+          "method": "SystemOne Guard",
+          "n": 600,
+          "accuracy": 1.0,
+          "macro_f1": 1.0,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 3.097994500421919,
+          "p95_latency_ms": 5.9764478508441226,
+          "mean_latency_ms": 3.5462179200840183,
+          "confusion_matrix": [
+            [
+              35,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              151,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              414,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "latency_n": 100,
+          "per_class": {
+            "allow": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 35.0
+            },
+            "review": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 151.0
+            },
+            "block": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 414.0
+            }
+          },
+          "nll": 0.005194287897601847,
+          "brier": 0.000368598939587673,
+          "ece_10": 0.005093654893448031,
+          "aux_accuracy": {
+            "sensitive": 1.0,
+            "approval_needed": 1.0,
+            "attack": 1.0
+          }
+        },
+        {
+          "method": "SmolLM2-135M-Instruct-LoRA",
+          "n": 600,
+          "accuracy": 0.9983333333333333,
+          "macro_f1": 0.998490489415392,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 127.18228850280866,
+          "p95_latency_ms": 181.58516604780743,
+          "mean_latency_ms": 130.76336053003615,
+          "confusion_matrix": [
+            [
+              35,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              150,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              414,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "latency_n": 100,
+          "per_class": {
+            "allow": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 35.0
+            },
+            "review": {
+              "precision": 1.0,
+              "recall": 0.9933774834437086,
+              "f1-score": 0.9966777408637874,
+              "support": 151.0
+            },
+            "block": {
+              "precision": 0.9975903614457832,
+              "recall": 1.0,
+              "f1-score": 0.9987937273823885,
+              "support": 414.0
+            }
+          },
+          "nll": 0.002165314067890791,
+          "brier": 0.0016789431864413647,
+          "ece_10": 0.0012876875437965467,
+          "aux_accuracy": {
+            "sensitive": 1.0,
+            "approval_needed": 1.0,
+            "attack": 1.0
+          },
+          "generation": {
+            "method": "SmolLM2-135M-Instruct-LoRA",
+            "n": 600,
+            "accuracy": 0.9983333333333333,
+            "macro_f1": 0.998490489415392,
+            "invalid_rate": 0.0,
+            "median_latency_ms": 152.5386739995156,
+            "p95_latency_ms": 208.42342984833522,
+            "mean_latency_ms": 155.60736824947526,
+            "confusion_matrix": [
+              [
+                35,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                150,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                414,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0
+              ]
+            ],
+            "latency_n": 100,
+            "per_class": {
+              "allow": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1-score": 1.0,
+                "support": 35.0
+              },
+              "review": {
+                "precision": 1.0,
+                "recall": 0.9933774834437086,
+                "f1-score": 0.9966777408637874,
+                "support": 151.0
+              },
+              "block": {
+                "precision": 0.9975903614457832,
+                "recall": 1.0,
+                "f1-score": 0.9987937273823885,
+                "support": 414.0
+              }
+            }
+          }
+        }
+      ],
+      "manual_probes": [
+        {
+          "method": "SystemOne Guard",
+          "n": 24,
+          "accuracy": 0.7916666666666666,
+          "macro_f1": 0.8100664767331435,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 3.1731740018585697,
+          "p95_latency_ms": 4.979808351345126,
+          "mean_latency_ms": 3.4126210005827793,
+          "confusion_matrix": [
+            [
+              4,
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              4,
+              0,
+              0
+            ],
+            [
+              2,
+              0,
+              11,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "per_class": {
+            "allow": {
+              "precision": 0.6666666666666666,
+              "recall": 0.5714285714285714,
+              "f1-score": 0.6153846153846154,
+              "support": 7.0
+            },
+            "review": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 4.0
+            },
+            "block": {
+              "precision": 0.7857142857142857,
+              "recall": 0.8461538461538461,
+              "f1-score": 0.8148148148148148,
+              "support": 13.0
+            }
+          },
+          "nll": 0.7789939415542729,
+          "brier": 0.36913957474379405,
+          "ece_10": 0.19767700039962277,
+          "aux_accuracy": {
+            "sensitive": 1.0,
+            "approval_needed": 1.0,
+            "attack": 0.75
+          },
+          "by_group": {
+            "novel adversarial override": {
+              "n": 10,
+              "accuracy": 0.8
+            },
+            "novel benign quotation": {
+              "n": 5,
+              "accuracy": 0.4
+            },
+            "novel policy composition": {
+              "n": 9,
+              "accuracy": 1.0
+            }
+          }
+        },
+        {
+          "method": "SmolLM2-135M-Instruct-LoRA",
+          "n": 24,
+          "accuracy": 0.9583333333333334,
+          "macro_f1": 0.9644444444444445,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 145.35783550309134,
+          "p95_latency_ms": 211.126120697736,
+          "mean_latency_ms": 149.9367388751125,
+          "confusion_matrix": [
+            [
+              7,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              4,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "per_class": {
+            "allow": {
+              "precision": 0.875,
+              "recall": 1.0,
+              "f1-score": 0.9333333333333333,
+              "support": 7.0
+            },
+            "review": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 4.0
+            },
+            "block": {
+              "precision": 1.0,
+              "recall": 0.9230769230769231,
+              "f1-score": 0.96,
+              "support": 13.0
+            }
+          },
+          "nll": 0.03826071006173307,
+          "brier": 0.02861245140066702,
+          "ece_10": 0.02375801357816908,
+          "aux_accuracy": {
+            "sensitive": 1.0,
+            "approval_needed": 1.0,
+            "attack": 0.9583333333333334
+          },
+          "generation": {
+            "method": "SmolLM2-135M-Instruct-LoRA",
+            "n": 24,
+            "accuracy": 0.9583333333333334,
+            "macro_f1": 0.9644444444444445,
+            "invalid_rate": 0.0,
+            "median_latency_ms": 166.45320549650933,
+            "p95_latency_ms": 233.83742185033034,
+            "mean_latency_ms": 173.46743641671006,
+            "confusion_matrix": [
+              [
+                7,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                0,
+                0
+              ],
+              [
+                1,
+                0,
+                12,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0
+              ]
+            ],
+            "per_class": {
+              "allow": {
+                "precision": 0.875,
+                "recall": 1.0,
+                "f1-score": 0.9333333333333333,
+                "support": 7.0
+              },
+              "review": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1-score": 1.0,
+                "support": 4.0
+              },
+              "block": {
+                "precision": 1.0,
+                "recall": 0.9230769230769231,
+                "f1-score": 0.96,
+                "support": 13.0
+              }
+            }
+          },
+          "by_group": {
+            "novel adversarial override": {
+              "n": 10,
+              "accuracy": 0.9
+            },
+            "novel benign quotation": {
+              "n": 5,
+              "accuracy": 1.0
+            },
+            "novel policy composition": {
+              "n": 9,
+              "accuracy": 1.0
+            }
+          }
+        }
+      ],
+      "generalization": [
+        {
+          "method": "SystemOne Guard",
+          "n": 224,
+          "accuracy": 0.8973214285714286,
+          "macro_f1": 0.8915376055206563,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 3.2198004992096685,
+          "p95_latency_ms": 5.977318350414861,
+          "mean_latency_ms": 3.6138159898109734,
+          "confusion_matrix": [
+            [
+              85,
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              56,
+              8,
+              0
+            ],
+            [
+              4,
+              8,
+              60,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "latency_n": 100,
+          "per_class": {
+            "allow": {
+              "precision": 0.9550561797752809,
+              "recall": 0.9659090909090909,
+              "f1-score": 0.96045197740113,
+              "support": 88.0
+            },
+            "review": {
+              "precision": 0.875,
+              "recall": 0.875,
+              "f1-score": 0.875,
+              "support": 64.0
+            },
+            "block": {
+              "precision": 0.8450704225352113,
+              "recall": 0.8333333333333334,
+              "f1-score": 0.8391608391608392,
+              "support": 72.0
+            }
+          },
+          "nll": 0.28666365600687815,
+          "brier": 0.13915732724053842,
+          "ece_10": 0.06510116692535031,
+          "aux_accuracy": {
+            "sensitive": 1.0,
+            "approval_needed": 1.0,
+            "attack": 0.9241071428571429
+          },
+          "by_group": {
+            "benign quotations": {
+              "n": 96,
+              "accuracy": 1.0
+            },
+            "ordinary context": {
+              "n": 32,
+              "accuracy": 0.65625
+            },
+            "trusted-source instructions": {
+              "n": 24,
+              "accuracy": 1.0
+            },
+            "untrusted attacks": {
+              "n": 72,
+              "accuracy": 0.8333333333333334
+            }
+          }
+        },
+        {
+          "method": "SmolLM2-135M-Instruct-LoRA",
+          "n": 224,
+          "accuracy": 0.8169642857142857,
+          "macro_f1": 0.8204031029719103,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 124.07877050281968,
+          "p95_latency_ms": 160.68857514728734,
+          "mean_latency_ms": 126.01777878968278,
+          "confusion_matrix": [
+            [
+              66,
+              0,
+              22,
+              0
+            ],
+            [
+              0,
+              45,
+              19,
+              0
+            ],
+            [
+              0,
+              0,
+              72,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "latency_n": 100,
+          "per_class": {
+            "allow": {
+              "precision": 1.0,
+              "recall": 0.75,
+              "f1-score": 0.8571428571428571,
+              "support": 88.0
+            },
+            "review": {
+              "precision": 1.0,
+              "recall": 0.703125,
+              "f1-score": 0.8256880733944955,
+              "support": 64.0
+            },
+            "block": {
+              "precision": 0.6371681415929203,
+              "recall": 1.0,
+              "f1-score": 0.7783783783783784,
+              "support": 72.0
+            }
+          },
+          "nll": 2.122079915768585,
+          "brier": 0.3489219318729314,
+          "ece_10": 0.17634254503544272,
+          "aux_accuracy": {
+            "sensitive": 1.0,
+            "approval_needed": 0.96875,
+            "attack": 0.84375
+          },
+          "generation": {
+            "method": "SmolLM2-135M-Instruct-LoRA",
+            "n": 224,
+            "accuracy": 0.8169642857142857,
+            "macro_f1": 0.8204031029719103,
+            "invalid_rate": 0.0,
+            "median_latency_ms": 142.9351119986677,
+            "p95_latency_ms": 194.4778731001861,
+            "mean_latency_ms": 147.9765136900096,
+            "confusion_matrix": [
+              [
+                66,
+                0,
+                22,
+                0
+              ],
+              [
+                0,
+                45,
+                19,
+                0
+              ],
+              [
+                0,
+                0,
+                72,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0
+              ]
+            ],
+            "latency_n": 100,
+            "per_class": {
+              "allow": {
+                "precision": 1.0,
+                "recall": 0.75,
+                "f1-score": 0.8571428571428571,
+                "support": 88.0
+              },
+              "review": {
+                "precision": 1.0,
+                "recall": 0.703125,
+                "f1-score": 0.8256880733944955,
+                "support": 64.0
+              },
+              "block": {
+                "precision": 0.6371681415929203,
+                "recall": 1.0,
+                "f1-score": 0.7783783783783784,
+                "support": 72.0
+              }
+            }
+          },
+          "by_group": {
+            "benign quotations": {
+              "n": 96,
+              "accuracy": 0.7395833333333334
+            },
+            "ordinary context": {
+              "n": 32,
+              "accuracy": 0.5
+            },
+            "trusted-source instructions": {
+              "n": 24,
+              "accuracy": 1.0
+            },
+            "untrusted attacks": {
+              "n": 72,
+              "accuracy": 1.0
+            }
+          }
+        }
+      ]
+    },
+    "wording_snapshot_sha256": "26d6ac2310023a3cce6454e598f170a51703ddf51557e8a1abd9bbd374f130a8",
+    "role": "Development evidence after first post-training evaluation. Manual errors motivated augmentation v5; not a blind test for the final candidate."
+  },
+  "final_holdout_sha256": "751a2a8a1e85f74b533234ae43d3eaacf732196a1117387a5cbf5395b2ff7c85",
+  "final_holdout_examples": 128,
+  "targets": {
+    "manual_at_least_frozen_smollm": true,
+    "test_accuracy_at_least_99_5_percent": true,
+    "challenge_accuracy_at_least_99_5_percent": true,
+    "new_wording_accuracy_at_least_95_percent": false,
+    "median_latency_below_one_tenth_of_smollm": true
+  },
+  "all_targets_met": false,
+  "selected_guard_parameters": 756248,
+  "current_comparisons": {
+    "test": {
+      "quality_n": 1500,
+      "latency_n": 100,
+      "guard_correct": 1500,
+      "smollm_correct": 1500,
+      "additional_correct": 0,
+      "accuracy_gain_pp": 0.0,
+      "accuracy_relative_gain_percent": 0.0,
+      "accuracy_gain_ci95_pp": [
+        0.0,
+        0.0
+      ],
+      "latency": {
+        "median": {
+          "guard_ms": 4.108639499463607,
+          "smollm_ms": 112.03096199824358,
+          "saved_ms": 107.92232249877998,
+          "guard_reduction_percent": 96.33258571900149,
+          "guard_speedup": 27.267167638550305
+        },
+        "p95": {
+          "guard_ms": 693.1602989974606,
+          "smollm_ms": 3349.4486863499333,
+          "saved_ms": 2656.2883873524725,
+          "guard_reduction_percent": 79.30524202916412,
+          "guard_speedup": 4.832141556858271
+        },
+        "mean": {
+          "guard_ms": 149.12072933970194,
+          "smollm_ms": 400.95473336899886,
+          "saved_ms": 251.83400402929692,
+          "guard_reduction_percent": 62.80858737176547,
+          "guard_speedup": 2.6887927328708994
+        }
+      },
+      "formulas": {
+        "accuracy_gain_pp": "100 * (SmolLM2 correct - Guard correct) / quality n",
+        "accuracy_relative_gain_percent": "100 * (SmolLM2 correct - Guard correct) / Guard correct; undefined when Guard correct = 0",
+        "guard_latency_reduction_percent": "100 * (SmolLM2 latency - Guard latency) / SmolLM2 latency",
+        "guard_speedup": "SmolLM2 latency / Guard latency; ratio of the same statistic, not a median of per-example ratios"
+      }
+    },
+    "challenge": {
+      "quality_n": 600,
+      "latency_n": 100,
+      "guard_correct": 600,
+      "smollm_correct": 599,
+      "additional_correct": -1,
+      "accuracy_gain_pp": -0.16666666666666666,
+      "accuracy_relative_gain_percent": -0.16666666666666666,
+      "accuracy_gain_ci95_pp": [
+        -0.5,
+        0.0
+      ],
+      "latency": {
+        "median": {
+          "guard_ms": 3.3704494999255985,
+          "smollm_ms": 109.90157849664683,
+          "saved_ms": 106.53112899672124,
+          "guard_reduction_percent": 96.93321101841278,
+          "guard_speedup": 32.607395096432356
+        },
+        "p95": {
+          "guard_ms": 7.43539684881398,
+          "smollm_ms": 144.58993734842807,
+          "saved_ms": 137.1545404996141,
+          "guard_reduction_percent": 94.85759729537996,
+          "guard_speedup": 19.446162765541104
+        },
+        "mean": {
+          "guard_ms": 4.121405339901685,
+          "smollm_ms": 112.278266509893,
+          "saved_ms": 108.15686116999132,
+          "guard_reduction_percent": 96.32929375558311,
+          "guard_speedup": 27.24271389248294
+        }
+      },
+      "formulas": {
+        "accuracy_gain_pp": "100 * (SmolLM2 correct - Guard correct) / quality n",
+        "accuracy_relative_gain_percent": "100 * (SmolLM2 correct - Guard correct) / Guard correct; undefined when Guard correct = 0",
+        "guard_latency_reduction_percent": "100 * (SmolLM2 latency - Guard latency) / SmolLM2 latency",
+        "guard_speedup": "SmolLM2 latency / Guard latency; ratio of the same statistic, not a median of per-example ratios"
+      }
+    },
+    "manual_probes": {
+      "quality_n": 24,
+      "latency_n": 24,
+      "guard_correct": 24,
+      "smollm_correct": 23,
+      "additional_correct": -1,
+      "accuracy_gain_pp": -4.166666666666667,
+      "accuracy_relative_gain_percent": -4.166666666666667,
+      "accuracy_gain_ci95_pp": [
+        -12.5,
+        0.0
+      ],
+      "latency": {
+        "median": {
+          "guard_ms": 3.2895590011321474,
+          "smollm_ms": 101.15275550197111,
+          "saved_ms": 97.86319650083897,
+          "guard_reduction_percent": 96.74792942139075,
+          "guard_speedup": 30.749640139349374
+        },
+        "p95": {
+          "guard_ms": 6.622019101996556,
+          "smollm_ms": 124.63294519766349,
+          "saved_ms": 118.01092609566693,
+          "guard_reduction_percent": 94.6867827832406,
+          "guard_speedup": 18.8209884746612
+        },
+        "mean": {
+          "guard_ms": 4.040839958482441,
+          "smollm_ms": 103.06906154164608,
+          "saved_ms": 99.02822158316364,
+          "guard_reduction_percent": 96.07948311739533,
+          "guard_speedup": 25.506840805532473
+        }
+      },
+      "formulas": {
+        "accuracy_gain_pp": "100 * (SmolLM2 correct - Guard correct) / quality n",
+        "accuracy_relative_gain_percent": "100 * (SmolLM2 correct - Guard correct) / Guard correct; undefined when Guard correct = 0",
+        "guard_latency_reduction_percent": "100 * (SmolLM2 latency - Guard latency) / SmolLM2 latency",
+        "guard_speedup": "SmolLM2 latency / Guard latency; ratio of the same statistic, not a median of per-example ratios"
+      }
+    },
+    "generalization": {
+      "quality_n": 256,
+      "latency_n": 100,
+      "guard_correct": 232,
+      "smollm_correct": 174,
+      "additional_correct": -58,
+      "accuracy_gain_pp": -22.65625,
+      "accuracy_relative_gain_percent": -25.0,
+      "accuracy_gain_ci95_pp": [
+        -30.078125,
+        -15.234375
+      ],
+      "latency": {
+        "median": {
+          "guard_ms": 3.4375954965071287,
+          "smollm_ms": 114.77210950033623,
+          "saved_ms": 111.3345140038291,
+          "guard_reduction_percent": 97.00485116856979,
+          "guard_speedup": 33.387322509863026
+        },
+        "p95": {
+          "guard_ms": 6.433736649705679,
+          "smollm_ms": 156.5749425495596,
+          "saved_ms": 150.14120589985393,
+          "guard_reduction_percent": 95.89095384935602,
+          "guard_speedup": 24.336548272724585
+        },
+        "mean": {
+          "guard_ms": 4.129461420161533,
+          "smollm_ms": 119.55796329020814,
+          "saved_ms": 115.4285018700466,
+          "guard_reduction_percent": 96.54605907752216,
+          "guard_speedup": 28.952434984979558
+        }
+      },
+      "formulas": {
+        "accuracy_gain_pp": "100 * (SmolLM2 correct - Guard correct) / quality n",
+        "accuracy_relative_gain_percent": "100 * (SmolLM2 correct - Guard correct) / Guard correct; undefined when Guard correct = 0",
+        "guard_latency_reduction_percent": "100 * (SmolLM2 latency - Guard latency) / SmolLM2 latency",
+        "guard_speedup": "SmolLM2 latency / Guard latency; ratio of the same statistic, not a median of per-example ratios"
+      }
+    }
+  },
+  "small_candidate": {
+    "checkpoint_sha256": "f4fb4afa5f765bfac9d140355c169daadf9b951a0131147579dadfe33648c3c3",
+    "parameters": 95482,
+    "summaries": {
+      "test": [
+        {
+          "method": "SystemOne Guard",
+          "n": 1500,
+          "accuracy": 0.9986666666666667,
+          "macro_f1": 0.9986272502623074,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 2.4792724980216008,
+          "p95_latency_ms": 4.834883147123037,
+          "mean_latency_ms": 2.9366433196992148,
+          "confusion_matrix": [
+            [
+              104,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              312,
+              0,
+              0
+            ],
+            [
+              0,
+              2,
+              1082,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "latency_n": 100,
+          "per_class": {
+            "allow": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 104.0
+            },
+            "review": {
+              "precision": 0.9936305732484076,
+              "recall": 1.0,
+              "f1-score": 0.9968051118210862,
+              "support": 312.0
+            },
+            "block": {
+              "precision": 1.0,
+              "recall": 0.9981549815498155,
+              "f1-score": 0.9990766389658357,
+              "support": 1084.0
+            }
+          },
+          "nll": 0.014683024253831983,
+          "brier": 0.0034844605089128715,
+          "ece_10": 0.01270664693971444,
+          "aux_accuracy": {
+            "sensitive": 1.0,
+            "approval_needed": 1.0,
+            "attack": 1.0
+          }
+        },
+        {
+          "method": "SmolLM2-135M-Instruct-LoRA",
+          "n": 1500,
+          "accuracy": 1.0,
+          "macro_f1": 1.0,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 106.81348099751631,
+          "p95_latency_ms": 144.66216344917484,
+          "mean_latency_ms": 110.2705961396714,
+          "confusion_matrix": [
+            [
+              104,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              312,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1084,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "latency_n": 100,
+          "per_class": {
+            "allow": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 104.0
+            },
+            "review": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 312.0
+            },
+            "block": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 1084.0
+            }
+          },
+          "nll": 0.00026714220004400176,
+          "brier": 5.323411898377722e-05,
+          "ece_10": 0.0002522430055449009,
+          "aux_accuracy": {
+            "sensitive": 1.0,
+            "approval_needed": 1.0,
+            "attack": 1.0
+          },
+          "generation": {
+            "method": "SmolLM2-135M-Instruct-LoRA",
+            "n": 1500,
+            "accuracy": 1.0,
+            "macro_f1": 1.0,
+            "invalid_rate": 0.0,
+            "median_latency_ms": 127.3905644993647,
+            "p95_latency_ms": 175.13376815404627,
+            "mean_latency_ms": 133.25587096980598,
+            "confusion_matrix": [
+              [
+                104,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                312,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1084,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0
+              ]
+            ],
+            "latency_n": 100,
+            "per_class": {
+              "allow": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1-score": 1.0,
+                "support": 104.0
+              },
+              "review": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1-score": 1.0,
+                "support": 312.0
+              },
+              "block": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1-score": 1.0,
+                "support": 1084.0
+              }
+            }
+          }
+        }
+      ],
+      "challenge": [
+        {
+          "method": "SystemOne Guard",
+          "n": 600,
+          "accuracy": 1.0,
+          "macro_f1": 1.0,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 2.8880840036435984,
+          "p95_latency_ms": 4.870327797107166,
+          "mean_latency_ms": 3.238330410240451,
+          "confusion_matrix": [
+            [
+              35,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              151,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              414,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "latency_n": 100,
+          "per_class": {
+            "allow": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 35.0
+            },
+            "review": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 151.0
+            },
+            "block": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 414.0
+            }
+          },
+          "nll": 0.01421459806307071,
+          "brier": 0.0029660370611775933,
+          "ece_10": 0.013283451950789237,
+          "aux_accuracy": {
+            "sensitive": 1.0,
+            "approval_needed": 0.9983333333333333,
+            "attack": 1.0
+          }
+        },
+        {
+          "method": "SmolLM2-135M-Instruct-LoRA",
+          "n": 600,
+          "accuracy": 0.9983333333333333,
+          "macro_f1": 0.998490489415392,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 123.72726749890717,
+          "p95_latency_ms": 147.3996510507277,
+          "mean_latency_ms": 123.68762646961841,
+          "confusion_matrix": [
+            [
+              35,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              150,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              414,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "latency_n": 100,
+          "per_class": {
+            "allow": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 35.0
+            },
+            "review": {
+              "precision": 1.0,
+              "recall": 0.9933774834437086,
+              "f1-score": 0.9966777408637874,
+              "support": 151.0
+            },
+            "block": {
+              "precision": 0.9975903614457832,
+              "recall": 1.0,
+              "f1-score": 0.9987937273823885,
+              "support": 414.0
+            }
+          },
+          "nll": 0.002165314067890791,
+          "brier": 0.0016789431864413647,
+          "ece_10": 0.0012876875437965467,
+          "aux_accuracy": {
+            "sensitive": 1.0,
+            "approval_needed": 1.0,
+            "attack": 1.0
+          },
+          "generation": {
+            "method": "SmolLM2-135M-Instruct-LoRA",
+            "n": 600,
+            "accuracy": 0.9983333333333333,
+            "macro_f1": 0.998490489415392,
+            "invalid_rate": 0.0,
+            "median_latency_ms": 150.41702400048962,
+            "p95_latency_ms": 175.3838779481157,
+            "mean_latency_ms": 150.3153743792791,
+            "confusion_matrix": [
+              [
+                35,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                150,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                414,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0
+              ]
+            ],
+            "latency_n": 100,
+            "per_class": {
+              "allow": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1-score": 1.0,
+                "support": 35.0
+              },
+              "review": {
+                "precision": 1.0,
+                "recall": 0.9933774834437086,
+                "f1-score": 0.9966777408637874,
+                "support": 151.0
+              },
+              "block": {
+                "precision": 0.9975903614457832,
+                "recall": 1.0,
+                "f1-score": 0.9987937273823885,
+                "support": 414.0
+              }
+            }
+          }
+        }
+      ],
+      "manual_probes": [
+        {
+          "method": "SystemOne Guard",
+          "n": 24,
+          "accuracy": 0.7083333333333334,
+          "macro_f1": 0.7612958226768969,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 3.1280644980142824,
+          "p95_latency_ms": 5.3181905972451196,
+          "mean_latency_ms": 3.4665045407867487,
+          "confusion_matrix": [
+            [
+              5,
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              4,
+              0,
+              0
+            ],
+            [
+              5,
+              0,
+              8,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "per_class": {
+            "allow": {
+              "precision": 0.5,
+              "recall": 0.7142857142857143,
+              "f1-score": 0.5882352941176471,
+              "support": 7.0
+            },
+            "review": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 4.0
+            },
+            "block": {
+              "precision": 0.8,
+              "recall": 0.6153846153846154,
+              "f1-score": 0.6956521739130435,
+              "support": 13.0
+            }
+          },
+          "nll": 1.1278505964471641,
+          "brier": 0.4682671879948354,
+          "ece_10": 0.21837583822837892,
+          "aux_accuracy": {
+            "sensitive": 1.0,
+            "approval_needed": 1.0,
+            "attack": 0.75
+          },
+          "by_group": {
+            "novel adversarial override": {
+              "n": 10,
+              "accuracy": 0.5
+            },
+            "novel benign quotation": {
+              "n": 5,
+              "accuracy": 0.6
+            },
+            "novel policy composition": {
+              "n": 9,
+              "accuracy": 1.0
+            }
+          }
+        },
+        {
+          "method": "SmolLM2-135M-Instruct-LoRA",
+          "n": 24,
+          "accuracy": 0.9583333333333334,
+          "macro_f1": 0.9644444444444445,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 119.00121349754045,
+          "p95_latency_ms": 160.25183290403217,
+          "mean_latency_ms": 122.46964679131149,
+          "confusion_matrix": [
+            [
+              7,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              4,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              12,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "per_class": {
+            "allow": {
+              "precision": 0.875,
+              "recall": 1.0,
+              "f1-score": 0.9333333333333333,
+              "support": 7.0
+            },
+            "review": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1-score": 1.0,
+              "support": 4.0
+            },
+            "block": {
+              "precision": 1.0,
+              "recall": 0.9230769230769231,
+              "f1-score": 0.96,
+              "support": 13.0
+            }
+          },
+          "nll": 0.03826071006173307,
+          "brier": 0.02861245140066702,
+          "ece_10": 0.02375801357816908,
+          "aux_accuracy": {
+            "sensitive": 1.0,
+            "approval_needed": 1.0,
+            "attack": 0.9583333333333334
+          },
+          "generation": {
+            "method": "SmolLM2-135M-Instruct-LoRA",
+            "n": 24,
+            "accuracy": 0.9583333333333334,
+            "macro_f1": 0.9644444444444445,
+            "invalid_rate": 0.0,
+            "median_latency_ms": 140.54769649737864,
+            "p95_latency_ms": 182.01661394923576,
+            "mean_latency_ms": 144.84853299927636,
+            "confusion_matrix": [
+              [
+                7,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                0,
+                0
+              ],
+              [
+                1,
+                0,
+                12,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0
+              ]
+            ],
+            "per_class": {
+              "allow": {
+                "precision": 0.875,
+                "recall": 1.0,
+                "f1-score": 0.9333333333333333,
+                "support": 7.0
+              },
+              "review": {
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1-score": 1.0,
+                "support": 4.0
+              },
+              "block": {
+                "precision": 1.0,
+                "recall": 0.9230769230769231,
+                "f1-score": 0.96,
+                "support": 13.0
+              }
+            }
+          },
+          "by_group": {
+            "novel adversarial override": {
+              "n": 10,
+              "accuracy": 0.9
+            },
+            "novel benign quotation": {
+              "n": 5,
+              "accuracy": 1.0
+            },
+            "novel policy composition": {
+              "n": 9,
+              "accuracy": 1.0
+            }
+          }
+        }
+      ],
+      "generalization": [
+        {
+          "method": "SystemOne Guard",
+          "n": 128,
+          "accuracy": 0.90625,
+          "macro_f1": 0.8950692912957064,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 2.5942169995687436,
+          "p95_latency_ms": 4.767183246440254,
+          "mean_latency_ms": 3.1178869099676376,
+          "confusion_matrix": [
+            [
+              51,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              38,
+              2,
+              0
+            ],
+            [
+              3,
+              6,
+              27,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "latency_n": 100,
+          "per_class": {
+            "allow": {
+              "precision": 0.9444444444444444,
+              "recall": 0.9807692307692307,
+              "f1-score": 0.9622641509433962,
+              "support": 52.0
+            },
+            "review": {
+              "precision": 0.8636363636363636,
+              "recall": 0.95,
+              "f1-score": 0.9047619047619048,
+              "support": 40.0
+            },
+            "block": {
+              "precision": 0.9,
+              "recall": 0.75,
+              "f1-score": 0.8181818181818182,
+              "support": 36.0
+            }
+          },
+          "nll": 0.3911836842780396,
+          "brier": 0.16749197344047845,
+          "ece_10": 0.06479178004072131,
+          "aux_accuracy": {
+            "sensitive": 1.0,
+            "approval_needed": 1.0,
+            "attack": 0.90625
+          },
+          "by_group": {
+            "benign quotations": {
+              "n": 48,
+              "accuracy": 1.0
+            },
+            "ordinary context": {
+              "n": 32,
+              "accuracy": 0.90625
+            },
+            "trusted-source instructions": {
+              "n": 12,
+              "accuracy": 1.0
+            },
+            "untrusted attacks": {
+              "n": 36,
+              "accuracy": 0.75
+            }
+          }
+        },
+        {
+          "method": "SmolLM2-135M-Instruct-LoRA",
+          "n": 128,
+          "accuracy": 0.6640625,
+          "macro_f1": 0.6497343920632277,
+          "invalid_rate": 0.0,
+          "median_latency_ms": 116.49042549834121,
+          "p95_latency_ms": 143.5471437023807,
+          "mean_latency_ms": 116.98518394980056,
+          "confusion_matrix": [
+            [
+              35,
+              0,
+              17,
+              0
+            ],
+            [
+              0,
+              14,
+              26,
+              0
+            ],
+            [
+              0,
+              0,
+              36,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "latency_n": 100,
+          "per_class": {
+            "allow": {
+              "precision": 1.0,
+              "recall": 0.6730769230769231,
+              "f1-score": 0.8045977011494253,
+              "support": 52.0
+            },
+            "review": {
+              "precision": 1.0,
+              "recall": 0.35,
+              "f1-score": 0.5185185185185185,
+              "support": 40.0
+            },
+            "block": {
+              "precision": 0.45569620253164556,
+              "recall": 1.0,
+              "f1-score": 0.6260869565217392,
+              "support": 36.0
+            }
+          },
+          "nll": 5.26105736140625,
+          "brier": 0.6590869859214386,
+          "ece_10": 0.33441486307219254,
+          "aux_accuracy": {
+            "sensitive": 1.0,
+            "approval_needed": 1.0,
+            "attack": 0.6796875
+          },
+          "generation": {
+            "method": "SmolLM2-135M-Instruct-LoRA",
+            "n": 128,
+            "accuracy": 0.6640625,
+            "macro_f1": 0.6497343920632277,
+            "invalid_rate": 0.0,
+            "median_latency_ms": 141.18447649889276,
+            "p95_latency_ms": 184.31242959704832,
+            "mean_latency_ms": 143.50808262985083,
+            "confusion_matrix": [
+              [
+                35,
+                0,
+                17,
+                0
+              ],
+              [
+                0,
+                14,
+                26,
+                0
+              ],
+              [
+                0,
+                0,
+                36,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0
+              ]
+            ],
+            "latency_n": 100,
+            "per_class": {
+              "allow": {
+                "precision": 1.0,
+                "recall": 0.6730769230769231,
+                "f1-score": 0.8045977011494253,
+                "support": 52.0
+              },
+              "review": {
+                "precision": 1.0,
+                "recall": 0.35,
+                "f1-score": 0.5185185185185185,
+                "support": 40.0
+              },
+              "block": {
+                "precision": 0.45569620253164556,
+                "recall": 1.0,
+                "f1-score": 0.6260869565217392,
+                "support": 36.0
+              }
+            }
+          },
+          "by_group": {
+            "benign quotations": {
+              "n": 48,
+              "accuracy": 0.5
+            },
+            "ordinary context": {
+              "n": 32,
+              "accuracy": 0.40625
+            },
+            "trusted-source instructions": {
+              "n": 12,
+              "accuracy": 1.0
+            },
+            "untrusted attacks": {
+              "n": 36,
+              "accuracy": 1.0
+            }
+          }
+        }
+      ]
+    },
+    "wording_snapshot_sha256": "751a2a8a1e85f74b533234ae43d3eaacf732196a1117387a5cbf5395b2ff7c85",
+    "role": "Smaller from-scratch candidate; failed manual parity. User requested a larger model with more training. The second wording set is now development evidence."
+  },
+  "scaled_holdout_sha256": "e1a09d84786edf573f1469b62d52f94ffd3665afae256a948dc69451ddca998a",
+  "scaled_holdout_examples": 256,
+  "scaled_attempt": {
+    "status": "interrupted",
+    "reason": "Possible host RAM pressure during larger run; no final evaluation or parity claim",
+    "host_ram_gib": 7.6,
+    "history": [
+      {
+        "epoch": 1,
+        "train_weighted_loss": 0.44746937446126883,
+        "val_accuracy": 0.9468571428571428,
+        "val_macro_f1": 0.9360431347886985,
+        "val_nll": 0.4527351490181767,
+        "val_ece": 0.05261227650459144
+      },
+      {
+        "epoch": 2,
+        "train_weighted_loss": 0.1382984631821852,
+        "val_accuracy": 0.956,
+        "val_macro_f1": 0.9470543396612395,
+        "val_nll": 0.40466619466737636,
+        "val_ece": 0.04365143540739935
+      },
+      {
+        "epoch": 3,
+        "train_weighted_loss": 0.07087406135079535,
+        "val_accuracy": 0.9477142857142857,
+        "val_macro_f1": 0.937210886449578,
+        "val_nll": 0.5926488429955153,
+        "val_ece": 0.05221405400732837
+      },
+      {
+        "epoch": 4,
+        "train_weighted_loss": 0.04226884186871096,
+        "val_accuracy": 0.9557142857142857,
+        "val_macro_f1": 0.9464787800967649,
+        "val_nll": 0.4516356198278235,
+        "val_ece": 0.04421262050308361
+      },
+      {
+        "epoch": 5,
+        "train_weighted_loss": 0.02688696208695712,
+        "val_accuracy": 0.9797142857142858,
+        "val_macro_f1": 0.9762372404929893,
+        "val_nll": 0.21623048447209797,
+        "val_ece": 0.020050909450293752
+      }
+    ],
+    "outcome": "Best own-from-scratch checkpoint calibrated and evaluated after host-memory guard stopped continuation"
+  },
+  "scaled_continuation": {
+    "history": [
+      {
+        "epoch": 1,
+        "train_weighted_loss": 0.01677045980094274,
+        "val_accuracy": 0.9797142857142858,
+        "val_macro_f1": 0.9762372404929893,
+        "val_nll": 0.35472902383477106,
+        "val_ece": 0.020285469179836646
+      },
+      {
+        "epoch": 2,
+        "train_weighted_loss": 0.012911226935790625,
+        "val_accuracy": 0.9877142857142858,
+        "val_macro_f1": 0.9855516899381583,
+        "val_nll": 0.15724012739371496,
+        "val_ece": 0.012283365195835949
+      },
+      {
+        "epoch": 3,
+        "train_weighted_loss": 0.009030694701671442,
+        "val_accuracy": 0.968,
+        "val_macro_f1": 0.9628665320934454,
+        "val_nll": 0.37473569167837606,
+        "val_ece": 0.02952047188041828
+      },
+      {
+        "epoch": 4,
+        "train_weighted_loss": 0.007206395057377985,
+        "val_accuracy": 0.988,
+        "val_macro_f1": 0.9858379950808907,
+        "val_nll": 0.10628528904704819,
+        "val_ece": 0.011611208424038113
+      },
+      {
+        "epoch": 5,
+        "train_weighted_loss": 0.005824435397670059,
+        "val_accuracy": 0.9954285714285714,
+        "val_macro_f1": 0.9946640065593496,
+        "val_nll": 0.07022626419276144,
+        "val_ece": 0.004570502499762319
+      },
+      {
+        "epoch": 6,
+        "train_weighted_loss": 0.005434851455139681,
+        "val_accuracy": 0.9877142857142858,
+        "val_macro_f1": 0.9855516899381583,
+        "val_nll": 0.19345909857883073,
+        "val_ece": 0.012284614394190707
+      }
+    ],
+    "resource_limits": {
+      "ram_hard_limit_gib": 2,
+      "gpu_allocator_fraction": 0.2,
+      "microbatch": 32,
+      "accumulation": 4
+    },
+    "termination": "host memory safeguard",
+    "external_pretrained_weights": false
+  }
+}

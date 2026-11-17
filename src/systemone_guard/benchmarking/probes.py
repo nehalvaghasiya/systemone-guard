@@ -1,28 +1,11 @@
-"""Manually authored out-of-distribution probes, separate from model selection."""
+"""Fixed, manually authored probes shared by guard and fine-tuned SmolLM2 evaluation."""
 
-import argparse
-import json
-from pathlib import Path
-from typing import TypedDict
-
-from systemone_guard.inference import DecisionEngine
-from systemone_guard.types import DecisionInput, decision_input
+from ..types import DecisionInput
 
 
 class Probe(DecisionInput):
     gold: str
     note: str
-
-
-class ProbePrediction(TypedDict):
-    id: int
-    gold: str
-    predicted: str
-    correct: bool
-    confidence: float
-    note: str
-    context: str
-    probabilities: dict[str, float]
 
 
 def build_probes() -> list[Probe]:
@@ -114,49 +97,3 @@ def build_probes() -> list[Probe]:
         )
 
     return R
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--checkpoint", default="artifacts/guard_best/model.pt")
-    parser.add_argument("--out", default="experiments/manual_probes.json")
-    args = parser.parse_args()
-    engine = DecisionEngine(args.checkpoint)
-
-    records: list[ProbePrediction] = []
-
-    for i, r in enumerate(build_probes()):
-        inputs = decision_input(r)
-        prediction = engine.decide(**inputs)
-        records.append(
-            {
-                "id": i,
-                "gold": r["gold"],
-                "predicted": prediction["decision"],
-                "correct": prediction["decision"] == r["gold"],
-                "confidence": prediction["confidence"],
-                "note": r["note"],
-                "context": r["context"],
-                "probabilities": prediction["probabilities"],
-            }
-        )
-
-    res = {
-        "n": len(records),
-        "accuracy": sum(x["correct"] for x in records) / len(records),
-        "by_group": {
-            g: {
-                "n": sum(x["note"] == g for x in records),
-                "correct": sum(x["correct"] and x["note"] == g for x in records),
-            }
-            for g in sorted({x["note"] for x in records})
-        },
-        "records": records,
-    }
-    Path(args.out).parent.mkdir(parents=True, exist_ok=True)
-    Path(args.out).write_text(json.dumps(res, indent=2))
-    print(json.dumps({k: v for k, v in res.items() if k != "records"}, indent=2))
-
-
-if __name__ == "__main__":
-    main()

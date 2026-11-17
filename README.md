@@ -1,257 +1,135 @@
-# jev-from-scratch
+# systemone-guard
 
-### A Jev-inspired, from-scratch System One decision model for agent tool-call risk assessment
+A small System One classifier for agent tool-call risk assessment. **756,248 parameters**, trained from scratch, with a task-fine-tuned **SmolLM2-135M-Instruct** comparison.
 
-**Single-pass typed probabilistic decisions • 21,306 parameters • calibrated outputs • matched evaluation against pretrained instruction LLMs**
+SystemOne Guard takes a request, untrusted context, and five typed state fields. One forward pass produces `allow`, `review`, and `block` probabilities plus `sensitive`, `approval_needed`, and `attack` probabilities. The context encoder uses word and character-subword embeddings, parallel convolutions, three attention layers, attention/mean pooling, and a source-independent context-intent head. Learned policy heads combine intent and typed state. Typed state is authoritative, so the updated context classifier does not use request wording.
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](#setup) [![Training](https://img.shields.io/badge/training-from%20scratch-informational)](#architecture) [![Scope](https://img.shields.io/badge/scope-research%20only-orange)](#limitations)
+This is an original Jev-inspired research prototype with a synthetic policy task. The original 21K guard missed all ten unfamiliar attack phrasings. The refactored model and its separate wording evaluation are documented below. It is unsuitable as a production permissions or security boundary.
 
-> **Research prototype, not an official Jev implementation.** This original model is inspired by the *typed-decision / parallel-inference* design philosophy described publicly for Jev. It does **not** replicate Jev’s proprietary weights, architecture, or RLCD algorithm. **Do not use it as a production security enforcement mechanism.**
+The refactored guard reaches 24/24 on the existing manual probes, versus 23/24 for frozen SmolLM2 LoRA and 13/24 for the original guard. It remains a research model: the separate wording set exposes missed attacks. The [experiment record](docs/GUARD_IMPROVEMENT.md) retains all target results, including failures.
 
-## At a glance
+## Measured comparison
 
-| Property | Detail |
-|---|---|
-| Task | Agent tool-call risk triage: `ALLOW`, `REVIEW`, `BLOCK` |
-| Input | Request text, untrusted context, and typed program state |
-| Output | Parallel decision logits → calibrated probability distribution + auxiliary risk heads |
-| Model | Custom PyTorch CNN + attention pooling + structured-state fusion |
-| Size | **21,306 parameters** |
-| Training | From scratch on a 10,000-example synthetic labeled training set |
-| Real pretrained comparison | **SmolLM2-135M-Instruct** and **SmolLM2-360M-Instruct** via downloadable benchmarks |
-| Strongest caution | **54.17%** accuracy on 24 manually authored probes; all 10 unseen injection phrasings missed |
+<!-- BEGIN MEASURED COMPARISON -->
 
-**Jump to:** [Demo](#demo-live-typed-probabilistic-decision) · [Architecture](#architecture) · [Results](#measured-accuracy-synthetic-data) · [Pretrained comparison](#compare-against-real-pretrained-instruction-llms) · [Reproduce](#exact-reproducibility-commands) · [Limitations](#limitations)
+Measured comparison with **SmolLM2-135M-Instruct fine-tuned using LoRA** (134,515,008 merged parameters) and **SystemOne Guard** (756,248 parameters). Both return the decision and all three auxiliary outputs.
 
-## Compare against real pretrained instruction LLMs
+| Split | Guard correct / total | LoRA correct / total | Guard accuracy | LoRA accuracy | LoRA - Guard |
+|---|---:|---:|---:|---:|---:|
+| Test | 1500/1500 | 1500/1500 | 100.0000% | 100.0000% | +0.0000 pp (+0 correct) |
+| Challenge | 600/600 | 599/600 | 100.0000% | 99.8333% | -0.1667 pp (-1 correct) |
+| Manual probes | 24/24 | 23/24 | 100.0000% | 95.8333% | -4.1667 pp (-1 correct) |
+| New wording | 232/256 | 174/256 | 90.6250% | 67.9688% | -22.6562 pp (-58 correct) |
 
-The earlier **scratch-trained causal transformer** was **not** the pretrained System Two comparator requested. This corrected edition adds an actual Hugging Face pretrained LLM benchmark for **SmolLM2-135M-Instruct** and **SmolLM2-360M-Instruct**. These are existing instruction-tuned models; this project does not retrain them.
+Accuracy differences above are **percentage points**, with Guard as the accuracy baseline. Positive differences favor LoRA; negative differences favor Guard. The previously inspected manual probes are a development benchmark. The final wording set has 256 examples from 64 separately authored contexts and was frozen before candidate training; it is still a synthetic diagnostic.
 
-**Pretrained benchmark scores are not claimed here:** the local authoring runtime cannot download model weights from Hugging Face. Download/run the Colab notebook `notebooks/Compare_Pretrained_SystemOne_SystemTwo.ipynb` in an internet-enabled runtime, or run:
+| Split | Timed requests per model | Guard median | LoRA median | Guard saves | Guard latency reduction | Guard speedup |
+|---|---:|---:|---:|---:|---:|---:|
+| Test | 100 | 4.109 ms | 112.031 ms | 107.922 ms | 96.33% | 27.27x |
+| Challenge | 100 | 3.370 ms | 109.902 ms | 106.531 ms | 96.93% | 32.61x |
+| Manual probes | 24 | 3.290 ms | 101.153 ms | 97.863 ms | 96.75% | 30.75x |
+| New wording | 100 | 3.438 ms | 114.772 ms | 111.335 ms | 97.00% | 33.39x |
+
+Latency is measured on the **same NVIDIA GeForce RTX 4050 Laptop GPU**, FP32, batch size 1, 2 host threads, with device synchronization and tokenization, all four outputs, decoding and probability extraction included. Both models remain loaded; measurement order alternates per example after five warmup examples each. Loading, adapter merging, and warmup are excluded. Quality uses every example; untimed records have null latency. Quality batches are not reported as request latency.
+
+**Latency reduction** = `100 x (LoRA ms - Guard ms) / LoRA ms`. **Speedup** = `LoRA ms / Guard ms`. Each ratio uses the same statistic (median, p95, or mean); reduction is not a speedup percentage.
+
+The recorded inference workers used a 1.5 GiB host-RAM cap and a 150% CPU quota to preserve desktop responsiveness. These are measurements of this constrained reference implementation. Previously executed LoRA quality may be reused only when model, input and prompt hashes match; every reported latency is freshly measured.
+
+<!-- END MEASURED COMPARISON -->
+
+![Guard versus fine-tuned SmolLM2 accuracy and exact gains](figures/comparison.png)
+
+![Guard versus fine-tuned SmolLM2 matched GPU latency](figures/latency.png)
+
+The [complete comparison](docs/FINETUNED_COMPARISON.md) includes macro-F1, NLL, Brier score, ECE, all auxiliary heads, per-class precision/recall/F1, confusion matrices, free-generation checks, probe groups, incorrect example IDs, and paired accuracy intervals. All tables and plots use the same two models and raw records.
+
+## Setup and reproduction
+
+Python 3.10+ supports the guard and CPU development checks. The measured GPU environment uses Python 3.11 and CUDA 12.6 PyTorch in a separate `.venv-gpu` environment.
 
 ```bash
-pip install -e '.[llm,dev]'
-python -m systemone_guard.benchmarking.pretrained --split test --count 100 --threads 2 --device cpu --out experiments/pretrained_test_100.json
-python scripts/plots.py pretrained --input experiments/pretrained_test_100.json --out figures/pretrained_test_100
+make setup
+make check
+
+# The original data/checkpoints are local research artifacts.
+# Generate/train only when recreating them:
+make data
+make setup-gpu
+make improve-guard
+
+make setup-gpu
+make finetune
+make benchmark ARGS='--split test'
+make benchmark ARGS='--split challenge'
+make benchmark ARGS='--split manual_probes'
+make benchmark ARGS='--split generalization'
+make plots
+make report
 ```
 
-The script benchmarks **the same selected examples**, with strict typed output parsing, per-example predictions, accuracy/macro-F1, invalid output rate, **median and p95 per-request end-to-end CPU latency**, and actual plots. Both use two CPU threads, including input processing and output decoding; model downloads, initial loading and warmup are excluded. It also records SystemOne's typed decision probabilities. No pretrained-LLM scores are invented or copied from unrelated evaluations.
+Reuse `artifacts/smollm2_lora/best` when it already contains the completed adapter; evaluation does not require another training run. Guard now uses 90,000 training and 3,500 validation examples, including broader compositional contexts. The frozen SmolLM2 adapter uses its original 10,000 training and 1,500 validation examples; the task-data budgets differ. The selected LoRA run trained 2,442,240 adapter parameters in 25.82 minutes, peaking at 3.14 GiB allocated and 3.59 GiB reserved GPU memory. The selected adapter is merged into FP32 weights for evaluation.
 
-Read [complete protocol and limitations](docs/PRETRAINED_LLM_BENCHMARK.md). Model cards: [135M](https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct) and [360M](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct).
+`make benchmark` requires the completed adapter and compares only Guard and the fine-tuned SmolLM2. It writes `experiments/finetuned_<split>.json`. `make plots` and `make report` verify every summary and effect against the raw records before regenerating published results. Fresh latency measurements will vary with machine load and hardware.
 
-## Demo: live typed probabilistic decision
+## Model use
 
-```bash
-pip install -e '.[dev,demo]'
-python -m systemone_guard.inference
-python spaces/app.py
+```python
+from systemone_guard.inference import DecisionEngine
+
+engine = DecisionEngine("artifacts/guard_scaled/model.pt")
+result = engine.decide(
+    request="Read team documents for an audit",
+    context="Tool returned a normal response.",
+    action="read",
+    sensitivity="internal",
+    destination="internal",
+    authorization="approved",
+    source="user",
+)
+print(result)
 ```
 
-```json
-{
-  "decision": "allow",
-  "probabilities": {"allow": 0.999996, "review": 0.000004, "block": 0.0},
-  "confidence": 0.999996,
-  "review_recommended": false,
-  "model_type": "single_pass_parallel_typed_decision"
-}
-```
+The checkpoint and custom Python source are required. `DecisionEngine(..., device="cuda")` runs the same guard on GPU. `make demo` launches the Gradio interface after installing the `demo` extra; it displays predictions without executing tools.
 
-The example above is the actual output of the packaged trained checkpoint in this environment (format shortened). The UI accepts an agent request, retrieved/tool context, action, sensitivity, destination, authorization, and trust source. It displays `allow/review/block` probabilities and separate sensitive-data, approval, and injection predictions. It **does not execute tools**.
-
-![Measured accuracy comparison on synthetic data](figures/comparison.png)
-![Measured training curves](figures/train_loss.png)
-![Measured validation loss](figures/val_loss.png)
-
-## The problem
-
-Agents increasingly read untrusted webpages, emails, PDFs, and tool responses before calling tools. Before a downstream tool executes, a policy system may need a fast, typed assessment: should the request be allowed, reviewed, or blocked? We simulate that decision over structured program state plus untrusted text. The task deliberately includes attacks, benign quotations of attack strings, sensitive-data movement, authorization, and destructive operations.
-
-A powerful real deployment must use **deterministic permissions / allowlists / approval gates first**. The classifier is auxiliary and may be wrong or overconfident. The training data is synthetic, policy-generated, and highly limited.
-
-## Architecture
+## Architecture and training
 
 ```mermaid
 flowchart TD
-  A[Request + untrusted context] --> B[Custom word tokenizer]
-  B --> C[Token embedding]
-  C --> D[Parallel depthwise CNN kernels 3 and 5]
-  D --> E[Attention pooling]
-  F[Typed program state] --> G[Categorical embeddings]
-  E --> H[Shared fusion network]
-  G --> H
-  H --> I[Allow / Review / Block logits]
-  H --> J[Sensitive data logits]
-  H --> K[Approval-needed logits]
-  H --> L[Injection indicator logits]
-  I --> M[Validation-fit temperature]
-  M --> N[Typed probabilities]
+    A[Untrusted context] --> B[Word and subword embeddings]
+    B --> C[Parallel depthwise CNNs]
+    C --> T[Three context attention layers]
+    T --> D[Attention and mean pooling]
+    E[Five typed state fields] --> F[State embeddings]
+    D --> G[Fusion network]
+    F --> G
+    G --> H[Decision probabilities]
+    G --> I[Sensitive probabilities]
+    G --> J[Approval probabilities]
+    G --> K[Attack probabilities]
 ```
 
-The four heads are evaluated in one `torch.forward` call. There is no autoregressive text decoding. The selected model has **21,306 parameters**, randomly initialized and trained only on the bundled synthetic dataset, with no pretrained backbone, API, or hidden model.
+The updated guard uses four public heads and an auxiliary source-independent context-intent objective, ten-percent word dropout, validation selection with NLL tie-breaking, and validation temperature scaling. SmolLM2 uses response-only rank-8 LoRA to produce the same four outputs, with validation selection and temperature fitting. Both evaluations exclude gold labels from model inputs. The original 24 probes were previously inspected and are now a development benchmark. A separate set of 256 examples across 64 context strings was frozen before candidate training and excluded from model selection. SmolLM2 also receives the policy in its prompt. Evaluation inputs and timing hardware are matched; task data, prior training, parameter counts, objectives, representations, and training compute differ.
 
-The architecture is an *original compact classifier*, not Jev's proprietary network; its training uses standard weighted supervised cross-entropy and post-hoc temperature scaling, **not RLCD**.
+The manual result improved from 13/24 to 24/24, compared with LoRA's 23/24. On the separate wording set, Guard scores 232/256 overall but misses 24/72 untrusted attacks; LoRA detects all 72 and makes more benign-context errors. The 95% wording-set target remains unmet. These results do not establish general security robustness or parity on every behavior. See [the experiment record](docs/GUARD_IMPROVEMENT.md).
 
-## What was actually trained and compared?
+![Recorded training traces for Guard and fine-tuned SmolLM2](figures/training.png)
 
-| Model | Training | Data received | Status |
-|---|---|---|---|
-| SystemOne Guard (21K) | Random init, custom parallel encoder, 6 epochs, 10K examples | Request/context + structured state | Trained and evaluated |
-| Word TF-IDF + logistic regression | Supervised 10K examples | Request/context + serialized same state | Trained and evaluated |
-| Character TF-IDF + logistic regression | Supervised 4K examples (resource-limited) | Request/context + serialized same state | Trained and evaluated; **not equal data budget** |
-| Tiny causal next-label transformer (18K) | Random init, 4 epochs, 10K examples | Request/context text, **not structured state embeddings** | Trained and evaluated; **not a comparable pretrained instruction model** |
-| SmolLM2-135M-Instruct | Existing Apache-2.0 pretrained instruction model | Request/context + typed state in prompt | Colab **benchmark script included; NOT executed** (network inaccessible here) |
-| SmolLM2-360M-Instruct | Existing Apache-2.0 pretrained instruction model | Request/context + typed state in prompt | Colab **benchmark script included; NOT executed** (network inaccessible here) |
+The remaining paired figures show [calibration](figures/calibration.png), [confusion matrices](figures/confusion.png), and [auxiliary accuracy](figures/auxiliary_accuracy.png).
 
-The causal decoder is still a narrowly trained small model, not a general language model; **do not claim superiority over modern pretrained LLMs based on its score**. The actual SmolLM2 comparator needs to run in your connected Colab environment. See `systemone_guard.benchmarking.pretrained`.
+## Repository conventions
 
-### Measured accuracy (synthetic data)
+Use `make format` for Ruff import sorting, wrapping and indentation, plus logical-section spacing. `make check` runs formatting checks, Ruff, strict mypy, and self-contained tests. `make verify-package` builds and checks the installable distribution; `make test-artifacts` validates the original local data and checkpoint. `make clean` retains research assets.
 
-| Method | Validation 1,500 | Test 1,500 | Challenge 600 |
-|---|---:|---:|---:|
-| SystemOne Guard | 100% | 99.87% | 100% |
-| Word TF-IDF | See report | 90.67% | 91.50% |
-| Character TF-IDF | See report | 81.40% | 80.83% |
-| Causal decoder scratch | See report | 88.13% | 78.83% |
+- `src/systemone_guard/`: guard data, training, inference, metrics, and paired benchmarking.
+- `scripts/`: formatting, dependency audit, plots, and Hugging Face export.
+- `experiments/`: four paired evaluation reports, two actual training traces, and the before/after experiment record.
+- `figures/`: six canonical figures, each including both comparison models.
+- `docs/`: [evaluation protocol](docs/EVALUATION.md), [reproducibility](docs/REPRODUCIBILITY_REPORT.md), [architecture](docs/ARCHITECTURE.md), and [development](docs/DEVELOPMENT.md).
+- `notebooks/`: guard training and the fine-tuned comparison workflow.
 
-The validation/test/challenge datasets share the same policy generator and attack-context dictionary; only *request templates* differ, and the challenge changes operation frequencies. The synthetic "challenge" should **not** be interpreted as an independent security red-team benchmark.
+## Limits
 
-### Generalization warning: manual adversarial probes
+The synthetic labels come from a deterministic simulated policy. High test accuracy demonstrates learning that generator, not reliable handling of arbitrary real tool calls. The [before/after experiment](docs/GUARD_IMPROVEMENT.md) retains the original manual failures, candidate-selection history, and all declared target results. Neither a gain on previously inspected probes nor a small synthetic holdout establishes production prompt-injection protection. Keep deterministic authorization and approval checks independent of model suggestions.
 
-Twenty-four manually worded probes (not generated by the training templates) yield **54.17% accuracy**. All **10 novel adversarial prompt-injection phrasings were missed**. See `experiments/manual_probes.json`. This is a serious failure and proves that the synthetic performance does not transfer reliably to new attacks. The model may be highly confident and wrong. Never put it on an agent's enforcement path without a stronger design, realistic labeled data, and separate validation.
-
-![Measured synthetic confusion matrix](figures/confusion.png)
-![Measured synthetic calibration](figures/calibration.png)
-
-### Timing
-
-CPU, PyTorch, two threads, batch=128, 40 repeated forward passes after warmup (no tokenization/preprocessing):
-
-| Model | Parameters | Median batch forward | Median amortized / item |
-|---|---:|---:|---:|
-| SystemOne Guard | 21,306 | 9.57 ms | 0.075 ms |
-| Tiny causal decoder (scratch) | 19,011 | 14.15 ms | 0.111 ms |
-
-These are *not* apples-to-apples pre-trained-LLM measurements and do not imply a 40–200x speedup over an LLM. End-to-end UI and CPU single-request latency will be different.
-
-## Development workflow
-
-The package uses a src layout, locked uv dependencies, Ruff formatting and linting,
-strict mypy, and self-contained CPU tests. From the repository root:
-
-```bash
-make setup
-make format
-make check
-make build
-make help
-```
-
-See [development conventions and all commands](docs/DEVELOPMENT.md) for dependency
-updates, optional extras, coverage, packaging, and research workflows.
-
-## Quick start
-
-From the extracted project root:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
-pip install -e '.[dev,demo]'
-python -m pytest -q
-```
-
-Alternatively, with `uv`:
-
-```bash
-make setup
-make check
-make demo
-```
-
-The original project bundle includes `artifacts/guard_best/model.pt`. These large artifacts are ignored by Git; a fresh checkout needs a supplied checkpoint or an explicit training run before launching the demo. Regular tests generate temporary fixtures. Use `make test-artifacts` to validate the original local assets.
-
-## Exact reproducibility commands
-
-Training dataset regeneration, with fixed seed and completely generated deterministic labels:
-
-```bash
-python -m systemone_guard.data
-```
-
-Reproduce selected configuration (seed 7, embedding dimension 32, fusion hidden 64):
-
-```bash
-python -m systemone_guard.train --data data --out artifacts/reproduced \
-  --epochs 6 --seed 7 --dim 32 --hidden 64 --lr 0.0015 --batch 128
-```
-
-**Checkpoint bytes may differ across PyTorch/OS versions.** The report is from the included checkpoint; reruns should be compared by metrics and seeds, not exact hashes. Repeated training is nondeterministic on some hardware. The runs under `artifacts/run_d16/`, `run_d32/`, `run_d48/` contain logs and checkpoint artifacts. One larger configuration (`run_d64`) was interrupted and is excluded from model selection.
-
-Train a causal next-label transformer comparator (weaker, lower data budget):
-
-```bash
-python -m systemone_guard.causal --epochs 4 --limit-train 0 --dim 32 --layers 1
-```
-
-Run all available models on the same saved splits:
-
-```bash
-python -m systemone_guard.evaluate --split val
-python -m systemone_guard.evaluate --split test
-python -m systemone_guard.evaluate --split challenge
-python scripts/evaluate_probes.py
-python scripts/plots.py results
-python scripts/benchmark_latency.py
-```
-
-The test dataset was inspected during this project development and the manual probes were examined *after* model selection; do not call them a blinded final test. For real use, build a fresh independently labeled benchmark **before** additional model tuning.
-
-### Compare with pretrained instruction LLMs in Colab
-
-Use the [matched CPU benchmark](#compare-against-real-pretrained-instruction-llms)
-or the comparison notebook. The same seeded sample, strict output parser, and
-end-to-end timing boundary apply to both methods. Actual pretrained model results
-remain unreported until the comparison is run.
-
-## Colab notebook
-
-Open `notebooks/Train_Evaluate_SystemOne_Guard.ipynb` in Google Colab, upload this whole ZIP in its setup cell, and run all. The notebook includes a retraining toggle and evaluates the packaged checkpoint by default. Run the matched pretrained comparison on CPU so both methods use the same device and timing boundary.
-
-## File guide
-
-- `src/systemone_guard/`: model, tokenizer, synthetic generator, training, inference, metrics, baselines, causal comparator
-- `artifacts/`: real trained weights, experiment configs, histories, TF-IDF `.pkl` files (only load your trusted own files)
-- `experiments/`: raw per-example predictions, metrics, run logs, measured timing, manual probes
-- `figures/`: measured comparison, calibration, confusion, training loss, validation macro-F1
-- `systemone_guard.benchmarking.pretrained`: the matched pretrained System Two benchmark
-- `notebooks/`: Colab workflow
-- `spaces/`: Gradio app for HF Spaces
-- `hf_model/README.md`: HF model card
-- `docs/`: architecture, evaluation protocol and limitations
-
-## Limitations
-
-1. **Strong class imbalance (~70% of training labels are `block`), plus synthetic labels and an inspectable deterministic policy** make the task easy; a hand-coded oracle matching the policy generator can reach 100%. There is no claim the model beats that oracle.
-2. **Novel attacks are missed.** The manual adversarial probe accuracy was 54.17% overall, 0/10 for unseen injection phrasing. It is not production-ready.
-3. **Calibration is local.** Low ECE on synthetically generated data does not imply epistemically honest probabilities on novel threats.
-4. **Not full Jev/RLCD.** The Jev network and optimization procedure are not public; this is original supervised multi-task training plus validation-set temperature scaling.
-5. **Pretrained LLM not benchmarked in this environment.** The compatible Colab script is included, but its result is intentionally blank.
-6. **Unbalanced baseline budgets.** Character TF-IDF trained with 4K examples; the word TF-IDF, causal decoder and SystemOne Guard each used 10K. Training objectives and model size still differ.
-7. **No true semantic robustness** established by this artificial corpus. Real-world tool context contains new dialects, nested instructions, adversarial encoding and complex user authorization states.
-
-## Reference and attribution
-
-- TypeSafe AI, *Introducing System One Models & Jev* (2026): https://typesafe.ai/blog/introducing-system-one-models-and-jev
-- Hugging Face, *SmolLM2-135M-Instruct*: https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct
-
-MIT licensed code. The synthetically generated data is made for this demonstration. No private user information is included.
-
-### Additional evidence
-
-- [Experiment ledger](docs/REPRODUCIBILITY_REPORT.md)
-- [Full evaluation limitations](docs/EVALUATION.md)
-- [HF model card](hf_model/README.md)
-- [Paired bootstrap comparison](experiments/bootstrap_summary.json)
-- [Manually authored adversarial probes](experiments/manual_probes.json)
-- [Standalone Hugging Face Space](dist/systemone-guard-space/)
+This project uses original supervised PyTorch code and synthetic data. It is inspired by typed parallel decision models and does not claim to reproduce Jev. Source code is MIT licensed; SmolLM2 model provenance is recorded in the training and evaluation reports.

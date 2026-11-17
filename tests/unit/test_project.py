@@ -4,8 +4,6 @@ import numpy as np
 import pytest
 import torch
 
-from systemone_guard.baselines import serialize
-from systemone_guard.causal import CausalDecisionLM
 from systemone_guard.data import CLASSES, load, policy_decision
 from systemone_guard.inference import DecisionEngine
 from systemone_guard.metrics import score
@@ -27,9 +25,9 @@ def test_disjoint_ids(dataset: Path) -> None:
     )
 
 
-def test_no_label_leak_baseline(dataset: Path) -> None:
-    s = serialize(load("train", dataset)[0])
-    assert "injection=" not in s and "decision=" not in s
+def test_no_label_leak(dataset: Path) -> None:
+    inputs = decision_input(load("train", dataset)[0])
+    assert "injection" not in inputs and "decision" not in inputs
 
 
 def test_shapes(dataset: Path) -> None:
@@ -73,14 +71,6 @@ def test_metrics_perfect() -> None:
     p = np.eye(3) * 0.999 + (0.001 / 3)
     m = score(p, y)
     assert m["accuracy"] == 1 and m["brier"] < 0.001
-
-
-def test_causal_shapes(dataset: Path) -> None:
-    rows = load("train", dataset)[:2]
-    t = Tokenizer(max_len=24).fit(rows)
-    x, f, _ = tensors(rows, t)
-    m = CausalDecisionLM(len(t.stoi), dim=32, layers=1, max_len=24)
-    assert m(x, f).shape == (2, 3)
 
 
 def test_attack_policy(dataset: Path) -> None:

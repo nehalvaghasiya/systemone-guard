@@ -1,132 +1,60 @@
-# Development workflow
+# Development
 
-Use GNU Make and uv from the repository root. Python 3.11 is the default;
-Python 3.10 remains supported and is tested in CI.
+Use Make as the command interface. `make help` lists commands and `ARGS='...'` passes options to a workflow. Python 3.10+ is supported for CPU development; the recorded GPU run uses Python 3.11.
 
 ```bash
 make setup
 make format
 make check
-make build
-make help
+make test-artifacts
+make verify-package
 ```
 
-`make setup` installs the exact versions in `uv.lock`, including CPU PyTorch
-and the development extra. Every tool command uses that same locked environment.
-Use `make lock` after changing dependency declarations; use
-`make lock ARGS=--upgrade` only for an intentional dependency upgrade.
-The CPU index is explicit and applies only to PyTorch.
+`make format` sorts imports with Ruff, applies Ruff formatting, inserts blank lines between logical sections, and formats again. `make format-check` checks the same convention without editing. `make lint` runs Ruff and `make typecheck` runs strict mypy across source, scripts, the demo, and tests. Formatting keeps model logic and expressions intact.
 
-The standard pip editable installation remains available for Colab and consumers:
-`python -m pip install -e '.[dev]'`. Pip does not use the uv lockfile.
-For Colab, install the package with its notebook extra:
-`python -m pip install -e '.[dev,notebook]'`.
+The self-contained tests use small generated datasets and temporary checkpoints. They test training, checkpoint compatibility, inference, matched evaluation, calibration, effect denominators, timing alignment, report validation, plots, notebooks, exports, and import safety. Artifact tests additionally check the original local checkpoint and data. Packaging tests build and install the wheel in isolation. `make smoke-extras` checks optional integrations without downloading model weights or publishing.
+
+## Research workflows
+
+```bash
+make data
+make setup-gpu
+make improve-guard
+make evaluate ARGS='--split test'
+
+make setup-gpu
+make finetune
+make benchmark ARGS='--split test'
+make benchmark ARGS='--split challenge'
+make benchmark ARGS='--split manual_probes'
+make benchmark ARGS='--split generalization'
+make plots
+make report
+```
+
+`make setup-gpu` creates `.venv-gpu` using the locked CUDA 12.6 PyTorch distribution and LoRA dependencies, leaving the CPU environment separate. `make benchmark` requires `artifacts/smollm2_lora/best`; override it with `ADAPTER=...`. A complete run and matching revision are mandatory. The guard defaults to `artifacts/guard_scaled/model.pt`; override it with `GUARD_CHECKPOINT=...`. `make improve-guard` builds disjoint context banks, checks exclusion of manual-probe text, and selects the subword/attention model using validation only. `make train` retains the legacy CPU training utility. Explicit `ARGS='--device cpu --split test'` supports diagnostic CPU execution, but changes the measurement conditions and requires regenerating the accompanying documentation.
+
+Data and weights are local ignored research artifacts. The compact evidence in `experiments/` consists of four matched pair reports, one training trace per model, and the before/after experiment record. `make plots` creates the six canonical figures. `make report` regenerates the complete comparison and marked overview sections in the README and model card. Both commands validate raw records against saved summaries, so regenerate evaluation reports before updating published results.
 
 ## Layout
 
-- `src/systemone_guard`: importable model, data, training, metrics, inference,
-  checkpoint loading, typed dictionary contracts, and reusable benchmark helpers.
-- `scripts`: explicit developer and research commands with `main()` functions.
-- `spaces`: optional Gradio adapter with a `create_demo()` factory.
-- `tests/unit` and `tests/integration`: deterministic tests and workflows.
-- `notebooks`, `docs`, and `hf_model`: notebooks and research documentation.
-- `data` and `artifacts`: ignored local datasets and trained weights.
-- `experiments` and `figures`: preserved published research outputs.
-- `dist`: generated Python distributions and local Space exports.
+- `src/systemone_guard/`: data generator, model, training, checkpoints, inference, metrics, and guard-only diagnostics.
+- `src/systemone_guard/benchmarking/`: LoRA training, paired evaluation, shared contracts, manual probes, effect calculation, and report generation.
+- `scripts/`: formatting, dependency audit, plots, and Hugging Face export.
+- `tests/`: CPU unit/integration tests, optional adapters, original artifacts, and distribution checks.
+- `notebooks/`: guard training and matched fine-tuned comparison workflows.
+- `experiments/`, `figures/`, `docs/`: compact measurements, canonical charts, and methodology.
 
-Install the project before importing it. The source layout intentionally prevents
-accidental imports of an uninstalled package from the checkout.
+`make clean` removes caches, build output, and coverage files while retaining datasets, checkpoints, reports, figures, and notebooks. CI runs source checks and distribution validation on Python 3.10/3.11, plus optional integration checks and dependency auditing.
 
-## Checks and conventions
+## Demo and export
 
-Ruff handles formatting, import sorting, and linting. Python uses four spaces,
-double quotes, and an 88-character formatting width. Make recipes use tabs.
-Ruff also checks notebook code cells; interactive notebook imports have narrowly
-scoped exceptions for unused imports and installation-before-import cells.
+Install the demo extra before `make demo`. `make prepare-space` exports a complete local Hugging Face Space, including the package source and guard checkpoint. `scripts/huggingface.py publish --repo ...` is an explicit publication command requiring the publish extra and an authenticated account. Local preparation does not publish anything.
 
-For Python files, `make format` also inserts one blank line around control-flow
-sections, before returns after computations, and when typed declarations start
-a new section. Adjacent related assignments stay together. Existing section
-breaks, attached comments, multiline strings, and `# fmt: off/on` regions are
-preserved. Notebook cells use Ruff's native formatting.
+## Training on a machine with limited RAM
 
-Ruff is allowed to fix import ordering only. Lint rules that would rewrite
-expressions, variable names, conditions, or return values remain diagnostic.
-The section-spacing pass compares Python ASTs before writing each file.
+The larger from-scratch guard streams uint16 token features from a NumPy disk cache. Only a 32-example microbatch becomes int64 tensors in RAM; accumulation keeps the effective batch at 128. Validation also uses batches of 32. The worker checks for at least 1.5 GiB available host memory and caps the PyTorch CUDA allocator at 20% of device memory.
 
-Strict mypy checks every handwritten Python file, including scripts, tests,
-and the demo. Shared TypedDicts retain existing dictionary and JSON shapes.
-Optional or untyped integrations have module-specific import exceptions.
-nbformat's validation APIs are the only library-wide untyped-call exception.
-No project modules are excluded from type checking.
+On Linux with a user systemd session, `make improve-guard` also isolates the worker in a scope with a 2 GiB hard RAM cap, no swap allocation, low CPU priority, and a 150% CPU quota. The cap applies to the training worker rather than the editor. `TRAIN_SCOPE=` explicitly disables the systemd wrapper on other platforms; the in-process memory checks remain. Checkpoints are written atomically. The original checkpoint remains separate; use `ARGS='--out artifacts/new_candidate'` to preserve an already measured candidate when starting another run.
 
-`make check` checks formatting, lint, typing, and the default test suite.
-`make format` applies import sorting, wrapping, indentation, and section spacing.
-`make format-check` verifies all of them without changing files. Optional local
-hooks can be installed with `make hooks`; they use the same formatting convention.
-`make coverage` reports branch coverage without imposing a percentage gate.
-
-## Tests and packaging
-
-Default tests generate small datasets and checkpoints in temporary directories.
-They require neither local research files, GPUs, model downloads, nor credentials.
-Packaging and optional-adapter tests have explicit pytest markers and run through
-separate Make targets; the default suite excludes them.
-
-```bash
-make test
-make test ARGS='-k checkpoint'
-make test-artifacts
-make verify-package
-make audit
-```
-
-The artifact target explicitly requires the original local checkpoint and dataset
-splits. It checks the checkpoint hash, state keys, output schema, and saved
-probabilities against the pre-refactor snapshot with an absolute tolerance of
-`1e-6`. Missing assets fail with the required path.
-
-Packaging builds both a wheel and source distribution and checks their metadata.
-`make verify-package` builds once, then runs the packaging integration test. It
-installs the wheel into a temporary environment using the locked CPU dependencies
-and verifies imports and inference outside the checkout.
-`make audit` accesses online vulnerability advisories and skips the local
-project. It maps CPU wheel suffixes such as `+cpu` to the upstream PyTorch
-release so the dependency is audited. CI runs it as a separate job.
-
-CI runs `make check verify-package` on Python 3.10 and 3.11. Optional-adapter
-integration tests run through `make smoke-extras` with the corresponding extras.
-The adapter test constructs the demo with a temporary checkpoint; it neither
-downloads pretrained weights nor uploads files.
-
-## Research commands
-
-```bash
-make data ARGS='--out data --seed 20261107'
-make train ARGS='--data data --out artifacts/reproduced --epochs 6 --seed 7 --dim 32 --hidden 64 --lr 0.0015 --batch 128'
-make evaluate ARGS='--split test --out experiments/new-run'
-make demo
-make benchmark ARGS='--split test --count 100'
-make prepare-space ARGS='--out dist/my-space'
-```
-
-Research commands can write results to their requested locations. Choose separate
-output paths when preserving published results. The matched pretrained benchmark
-is the single comparison implementation:
-`python -m systemone_guard.benchmarking.pretrained`. It uses a seeded subset,
-strict output parsing, and end-to-end CPU timing for both methods.
-
-The notebooks are maintained directly and validated by the test suite. Plotting
-uses `scripts/plots.py results` or `scripts/plots.py pretrained --input ...`.
-Space preparation uses `scripts/huggingface.py prepare`; explicit model uploads
-use `scripts/huggingface.py publish --repo ...` with the publish extra and HF_TOKEN.
-
-`make demo` and `make benchmark` enable the corresponding optional dependencies.
-For notebook work, run `uv sync --locked --extra dev --extra cpu --extra notebook`.
-For a GPU environment, omit the CPU extra, for example:
-`make setup EXTRAS='--extra dev --extra llm'`. Pass the same `EXTRAS` override to
-subsequent Make commands. The matched pretrained benchmark retains its CPU-only
-comparison policy.
-
-`make clean` removes Python caches, coverage outputs, and generated distributions.
-It preserves source, notebooks, datasets, checkpoints, experiments, and figures.
+`make benchmark` similarly uses a 1.5 GiB worker RAM cap and a 150% CPU quota. `BENCH_SCOPE=` disables that wrapper on other platforms. Run splits sequentially on this small host. `--reuse-reference /path/to/reports` can reuse executed frozen LoRA quality after verifying model/input/prompt identity; timings are always newly measured. Recovery and the selected interrupted-run trajectory are documented in [the reproducibility record](REPRODUCIBILITY_REPORT.md).

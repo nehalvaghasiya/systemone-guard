@@ -1,0 +1,285 @@
+{
+  "status": "calibrated_after_resource_stop",
+  "training_status": "stopped by host memory safeguard; selected checkpoint retained",
+  "initialization": "all weights trained from scratch; continued own interrupted checkpoint with a fresh optimizer",
+  "config": {
+    "seed": 7,
+    "dim": 64,
+    "hidden": 128,
+    "batch": 32,
+    "accumulation": 4,
+    "lr": 0.0003,
+    "epochs_requested": 8,
+    "subword_buckets": 4096,
+    "max_len": 160,
+    "context_only": true,
+    "attention_layers": 3,
+    "factorized_policy": true,
+    "training_precision": "bfloat16",
+    "stream_features": true
+  },
+  "augmentation_version": "context-families-v6",
+  "train_examples": 90000,
+  "validation_examples": 3500,
+  "train_sha256": "58949f0a1a38b7102cd72c377b65bea8ad72c639d919fc548d1f31099fa42e39",
+  "validation_sha256": "1fcd813aee39ccda8c9bb1ec37c11992bc31a3734d2e193fe84e13d32e665822",
+  "generalization_examples": 256,
+  "generalization_sha256": "e1a09d84786edf573f1469b62d52f94ffd3665afae256a948dc69451ddca998a",
+  "new_unique_contexts": {
+    "train": 37401,
+    "validation": 51,
+    "holdout": 64
+  },
+  "selection": "validation macro-F1, with lower validation NLL breaking ties",
+  "manual_probe_role": "previously inspected development benchmark; never training or selection",
+  "holdout_role": "separate wording bank frozen before training; never training or selection",
+  "comparison_scope": "broader task data for Guard; existing SmolLM2 LoRA adapter remains frozen",
+  "selected_epoch": 10,
+  "parameter_count": 756248,
+  "training_device": "cuda",
+  "temperature": 2.7302884615384615,
+  "best_val_macro_f1": 0.9946640065593496,
+  "selected_fp32_validation": {
+    "n": 3500,
+    "accuracy": 0.9954285714285714,
+    "macro_f1": 0.9946640065593496,
+    "nll": 0.07022625333015317,
+    "brier": 0.009142842885486295,
+    "ece_10": 0.004570502488172035,
+    "confusion_matrix": [
+      [
+        569,
+        0,
+        0
+      ],
+      [
+        0,
+        790,
+        0
+      ],
+      [
+        9,
+        7,
+        2125
+      ]
+    ]
+  },
+  "calibrated_validation": {
+    "n": 3500,
+    "accuracy": 0.9954285714285714,
+    "macro_f1": 0.9946640065593496,
+    "nll": 0.03046950628931538,
+    "brier": 0.009099834346764134,
+    "ece_10": 0.00015685514488195107,
+    "confusion_matrix": [
+      [
+        569,
+        0,
+        0
+      ],
+      [
+        0,
+        790,
+        0
+      ],
+      [
+        9,
+        7,
+        2125
+      ]
+    ],
+    "aux_accuracy": {
+      "sensitive": 1.0,
+      "approval_needed": 1.0,
+      "attack": 0.9914285714285714
+    }
+  },
+  "runtime_seconds": null,
+  "runtime_note": "Both stages were interrupted; full training wall time and peaks were not captured. Finalization time is separate.",
+  "finalization_seconds": 43.68775132999872,
+  "ram_hard_limit_bytes": 2147483648,
+  "gpu_allocator_fraction": 0.2,
+  "initial_training_history": [
+    {
+      "epoch": 1,
+      "train_weighted_loss": 0.44746937446126883,
+      "val_accuracy": 0.9468571428571428,
+      "val_macro_f1": 0.9360431347886985,
+      "val_nll": 0.4527351490181767,
+      "val_ece": 0.05261227650459144
+    },
+    {
+      "epoch": 2,
+      "train_weighted_loss": 0.1382984631821852,
+      "val_accuracy": 0.956,
+      "val_macro_f1": 0.9470543396612395,
+      "val_nll": 0.40466619466737636,
+      "val_ece": 0.04365143540739935
+    },
+    {
+      "epoch": 3,
+      "train_weighted_loss": 0.07087406135079535,
+      "val_accuracy": 0.9477142857142857,
+      "val_macro_f1": 0.937210886449578,
+      "val_nll": 0.5926488429955153,
+      "val_ece": 0.05221405400732837
+    },
+    {
+      "epoch": 4,
+      "train_weighted_loss": 0.04226884186871096,
+      "val_accuracy": 0.9557142857142857,
+      "val_macro_f1": 0.9464787800967649,
+      "val_nll": 0.4516356198278235,
+      "val_ece": 0.04421262050308361
+    },
+    {
+      "epoch": 5,
+      "train_weighted_loss": 0.02688696208695712,
+      "val_accuracy": 0.9797142857142858,
+      "val_macro_f1": 0.9762372404929893,
+      "val_nll": 0.21623048447209797,
+      "val_ece": 0.020050909450293752
+    }
+  ],
+  "continuation_history": [
+    {
+      "epoch": 1,
+      "train_weighted_loss": 0.01677045980094274,
+      "val_accuracy": 0.9797142857142858,
+      "val_macro_f1": 0.9762372404929893,
+      "val_nll": 0.35472902383477106,
+      "val_ece": 0.020285469179836646
+    },
+    {
+      "epoch": 2,
+      "train_weighted_loss": 0.012911226935790625,
+      "val_accuracy": 0.9877142857142858,
+      "val_macro_f1": 0.9855516899381583,
+      "val_nll": 0.15724012739371496,
+      "val_ece": 0.012283365195835949
+    },
+    {
+      "epoch": 3,
+      "train_weighted_loss": 0.009030694701671442,
+      "val_accuracy": 0.968,
+      "val_macro_f1": 0.9628665320934454,
+      "val_nll": 0.37473569167837606,
+      "val_ece": 0.02952047188041828
+    },
+    {
+      "epoch": 4,
+      "train_weighted_loss": 0.007206395057377985,
+      "val_accuracy": 0.988,
+      "val_macro_f1": 0.9858379950808907,
+      "val_nll": 0.10628528904704819,
+      "val_ece": 0.011611208424038113
+    },
+    {
+      "epoch": 5,
+      "train_weighted_loss": 0.005824435397670059,
+      "val_accuracy": 0.9954285714285714,
+      "val_macro_f1": 0.9946640065593496,
+      "val_nll": 0.07022626419276144,
+      "val_ece": 0.004570502499762319
+    },
+    {
+      "epoch": 6,
+      "train_weighted_loss": 0.005434851455139681,
+      "val_accuracy": 0.9877142857142858,
+      "val_macro_f1": 0.9855516899381583,
+      "val_nll": 0.19345909857883073,
+      "val_ece": 0.012284614394190707
+    }
+  ],
+  "history": [
+    {
+      "epoch": 1,
+      "train_weighted_loss": 0.44746937446126883,
+      "val_accuracy": 0.9468571428571428,
+      "val_macro_f1": 0.9360431347886985,
+      "val_nll": 0.4527351490181767,
+      "val_ece": 0.05261227650459144
+    },
+    {
+      "epoch": 2,
+      "train_weighted_loss": 0.1382984631821852,
+      "val_accuracy": 0.956,
+      "val_macro_f1": 0.9470543396612395,
+      "val_nll": 0.40466619466737636,
+      "val_ece": 0.04365143540739935
+    },
+    {
+      "epoch": 3,
+      "train_weighted_loss": 0.07087406135079535,
+      "val_accuracy": 0.9477142857142857,
+      "val_macro_f1": 0.937210886449578,
+      "val_nll": 0.5926488429955153,
+      "val_ece": 0.05221405400732837
+    },
+    {
+      "epoch": 4,
+      "train_weighted_loss": 0.04226884186871096,
+      "val_accuracy": 0.9557142857142857,
+      "val_macro_f1": 0.9464787800967649,
+      "val_nll": 0.4516356198278235,
+      "val_ece": 0.04421262050308361
+    },
+    {
+      "epoch": 5,
+      "train_weighted_loss": 0.02688696208695712,
+      "val_accuracy": 0.9797142857142858,
+      "val_macro_f1": 0.9762372404929893,
+      "val_nll": 0.21623048447209797,
+      "val_ece": 0.020050909450293752
+    },
+    {
+      "epoch": 6,
+      "train_weighted_loss": 0.01677045980094274,
+      "val_accuracy": 0.9797142857142858,
+      "val_macro_f1": 0.9762372404929893,
+      "val_nll": 0.35472902383477106,
+      "val_ece": 0.020285469179836646
+    },
+    {
+      "epoch": 7,
+      "train_weighted_loss": 0.012911226935790625,
+      "val_accuracy": 0.9877142857142858,
+      "val_macro_f1": 0.9855516899381583,
+      "val_nll": 0.15724012739371496,
+      "val_ece": 0.012283365195835949
+    },
+    {
+      "epoch": 8,
+      "train_weighted_loss": 0.009030694701671442,
+      "val_accuracy": 0.968,
+      "val_macro_f1": 0.9628665320934454,
+      "val_nll": 0.37473569167837606,
+      "val_ece": 0.02952047188041828
+    },
+    {
+      "epoch": 9,
+      "train_weighted_loss": 0.007206395057377985,
+      "val_accuracy": 0.988,
+      "val_macro_f1": 0.9858379950808907,
+      "val_nll": 0.10628528904704819,
+      "val_ece": 0.011611208424038113
+    },
+    {
+      "epoch": 10,
+      "train_weighted_loss": 0.005824435397670059,
+      "val_accuracy": 0.9954285714285714,
+      "val_macro_f1": 0.9946640065593496,
+      "val_nll": 0.07022626419276144,
+      "val_ece": 0.004570502499762319
+    },
+    {
+      "epoch": 11,
+      "train_weighted_loss": 0.005434851455139681,
+      "val_accuracy": 0.9877142857142858,
+      "val_macro_f1": 0.9855516899381583,
+      "val_nll": 0.19345909857883073,
+      "val_ece": 0.012284614394190707
+    }
+  ],
+  "checkpoint_sha256": "24563b99b1bbacf4cfb555d88f16f2074f934cd5c1da3826781af3279010e5ec"
+}

@@ -8,15 +8,15 @@ import sys
 from pathlib import Path
 
 import nbformat
-import numpy as np
 import pytest
 from scripts.huggingface import prepare
-from scripts.plots import create_pretrained, create_results
+from scripts.plots import create_plots
 
-from systemone_guard.benchmarking.pretrained import summarize
+from systemone_guard.benchmarking.analysis import METHODS, compare_records
+from systemone_guard.benchmarking.comparison import summarize
+from systemone_guard.benchmarking.reporting import load_reports
 from systemone_guard.benchmarking.types import BenchmarkRecord, BenchmarkResult
 from systemone_guard.inference import DecisionEngine
-from systemone_guard.metrics import score
 from systemone_guard.types import Example, decision_input
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -54,7 +54,16 @@ assert 'systemone_guard.train' not in sys.modules
 
 @pytest.mark.parametrize(
     "module",
-    ["data", "train", "evaluate", "inference", "causal", "benchmarking.pretrained"],
+    [
+        "data",
+        "train",
+        "robust_train",
+        "evaluate",
+        "inference",
+        "benchmarking.comparison",
+        "benchmarking.finetune",
+        "benchmarking.reporting",
+    ],
 )
 def test_module_help(module: str, tmp_path: Path) -> None:
     result = subprocess.run(
@@ -71,9 +80,6 @@ def test_module_help(module: str, tmp_path: Path) -> None:
     "name",
     [
         "audit_dependencies",
-        "benchmark_latency",
-        "bootstrap_summary",
-        "evaluate_probes",
         "format_sections",
         "huggingface",
         "plots",
@@ -125,10 +131,10 @@ def test_notebooks_validate() -> None:
 
 def test_space_export_includes_full_package(checkpoint: Path, tmp_path: Path) -> None:
     output = prepare(ROOT, tmp_path / "space", checkpoint)
-    assert (output / "systemone_guard/benchmarking/pretrained.py").is_file()
+    assert (output / "systemone_guard/benchmarking/comparison.py").is_file()
     assert (output / "systemone_guard/py.typed").is_file()
     assert (
-        output / "artifacts/guard_best/model.pt"
+        output / "artifacts/guard_scaled/model.pt"
     ).read_bytes() == checkpoint.read_bytes()
     assert "gradio" in (output / "requirements.txt").read_text()
     assert "sdk: gradio" in (output / "README.md").read_text()
@@ -182,61 +188,80 @@ def test_demo_remains_importable() -> None:
     assert callable(importlib.import_module("spaces.app").create_demo)
 
 
-def test_plot_outputs(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_reports_and_all_six_figures(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setenv("MPLCONFIGDIR", str(tmp_path / "matplotlib-cache"))
     experiments = tmp_path / "experiments"
     experiments.mkdir()
-    metrics = score(np.eye(3), np.arange(3))
-
-    for split in ("val", "test", "challenge"):
-        (experiments / f"{split}_metrics.json").write_text(
-            json.dumps({"systemone_guard": metrics})
-        )
-
-    artifacts = tmp_path / "artifacts"
-
-    for name in ("run_d16", "run_d32", "run_d48"):
-        directory = artifacts / name
-        directory.mkdir(parents=True)
-        (directory / "training.json").write_text(
-            json.dumps(
-                {
-                    "history": [
-                        {
-                            "epoch": 1,
-                            "train_weighted_loss": 0.3,
-                            "val_macro_f1": 1.0,
-                            "val_nll": 0.1,
-                        }
-                    ]
-                }
-            )
-        )
-
-    output = tmp_path / "figures"
-    create_results(experiments, artifacts, output)
-    assert {path.name for path in output.glob("*.png")} == {
-        "comparison.png",
-        "confusion.png",
-        "train_loss.png",
-        "val_f1.png",
-        "calibration.png",
-        "val_loss.png",
-    }
 
     records: list[BenchmarkRecord] = [
-        {"method": method, "gold": "allow", "prediction": "allow", "latency_ms": 1.0}
-        for method in ("guard", "test_model")
+        {
+            "id": "example-1",
+            "method": method,
+            "gold": "allow",
+            "prediction": "allow",
+            "latency_ms": latency,
+            "probabilities": {"allow": 0.8, "review": 0.1, "block": 0.1},
+            "auxiliary_gold": {"sensitive": 0, "approval_needed": 0, "attack": 0},
+            "auxiliary_probabilities": {
+                "sensitive": 0.1,
+                "approval_needed": 0.1,
+                "attack": 0.1,
+            },
+        }
+        for method, latency in zip(METHODS, (1.0, 10.0), strict=True)
     ]
     result: BenchmarkResult = {
-        "metadata": {"split": "test", "n": 1},
-        "summaries": [summarize(records, method) for method in ("guard", "test_model")],
+        "metadata": {"split": "test", "n": 1, "seed": 42},
+        "summaries": [summarize(records, method) for method in METHODS],
         "records": records,
+        "comparison": compare_records(records),
     }
-    report = tmp_path / "comparison.json"
-    report.write_text(json.dumps(result))
-    create_pretrained(report, output / "pretrained")
-    assert {path.name for path in (output / "pretrained").glob("*.png")} == {
-        "accuracy_latency.png",
-        "quality_vs_latency.png",
+
+    for split in ("test", "challenge", "manual_probes", "generalization"):
+        (experiments / f"finetuned_{split}.json").write_text(json.dumps(result))
+
+    (experiments / "guard_training.json").write_text(
+        json.dumps(
+            {
+                "history": [
+                    {
+                        "epoch": 1,
+                        "train_weighted_loss": 0.3,
+                        "val_macro_f1": 1.0,
+                        "val_nll": 0.1,
+                    }
+                ]
+            }
+        )
+    )
+    (experiments / "smollm2_finetuning.json").write_text(
+        json.dumps(
+            {
+                "history": [
+                    {
+                        "epoch": 1,
+                        "training_loss": 0.2,
+                        "validation": {"macro_f1": 1.0, "nll": 0.1},
+                    }
+                ]
+            }
+        )
+    )
+    output = tmp_path / "figures"
+    create_plots(experiments, output)
+    assert {path.name for path in output.glob("*.png")} == {
+        "comparison.png",
+        "latency.png",
+        "calibration.png",
+        "confusion.png",
+        "auxiliary_accuracy.png",
+        "training.png",
     }
+    assert all(path.stat().st_size > 10000 for path in output.glob("*.png"))
+    result["comparison"]["accuracy_gain_pp"] = 99.0
+    (experiments / "finetuned_test.json").write_text(json.dumps(result))
+
+    with pytest.raises(ValueError, match="differ from the raw records"):
+        load_reports(experiments)
