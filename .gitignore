@@ -1,5 +1,6 @@
 # Local environments and Python/build caches
 .venv/
+.venv-gpu/
 venv/
 env/
 .direnv/
@@ -38,7 +39,7 @@ Desktop.ini
 *.swo
 *~
 
-# Full experiment artifacts; compact reports belong in reports/.
+# Full experiment artifacts; compact reports belong in experiments/.
 data/
 data_lora/
 datasets/
