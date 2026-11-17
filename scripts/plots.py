@@ -236,14 +236,16 @@ def create_plots(
             axis.set_ylabel("Gold decision")
             axis.set_title(f"{label} · {DISPLAY_NAMES[method]}")
 
-            for (y, x), count in np.ndenumerate(matrix):
+            for (matrix_row, matrix_column), count in np.ndenumerate(matrix):
                 axis.text(
-                    x,
-                    y,
+                    matrix_column,
+                    matrix_row,
                     str(count),
                     ha="center",
                     va="center",
-                    color="white" if normalized[y, x] > 0.55 else "black",
+                    color="white"
+                    if normalized[matrix_row, matrix_column] > 0.55
+                    else "black",
                 )
 
     figure.suptitle(

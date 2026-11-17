@@ -95,8 +95,8 @@ strict = true
 explicit_package_bases = true
 mypy_path = ["src"]
 show_error_codes = true
-# nbformat's validation APIs expose untyped signatures.
-untyped_calls_exclude = ["nbformat"]
+# nbformat validation and NumPy 2.2's open_memmap expose untyped signatures.
+untyped_calls_exclude = ["nbformat", "numpy.lib.format.open_memmap"]
 
 [[tool.mypy.overrides]]
 # These integrations are untyped or optional in the CPU development environment.
